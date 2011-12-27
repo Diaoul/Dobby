@@ -14,3 +14,14 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
+
+from elixir import metadata, setup_all, create_all
+from models import *
+
+metadata.bind = "sqlite:///test.db"
+metadata.bind.echo = True
+
+
+def initDb():
+    setup_all()
+    create_all()
