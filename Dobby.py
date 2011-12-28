@@ -18,8 +18,12 @@
 
 from dobby import infos
 from dobby.config import initConfig
+from dobby.db import initDb
 from dobby.logger import initLogging, getLogger
 import argparse
+
+
+logger = getLogger()
 
 
 def main():
@@ -38,8 +42,9 @@ def main():
     
     # Init logging
     initLogging(args.quiet, args.verbose, config['Logging'])
-    logger = getLogger()
-    logger.info("Hello")
+    
+    # Init db
+    initDb()
     
     config.write()
 

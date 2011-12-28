@@ -14,3 +14,16 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
+
+
+import threading
+
+
+class Trigger(threading.Thread):
+    def __init__(self, event_queue):
+        super(Trigger, self).__init__()
+        self._stop = False
+        self.event_queue = event_queue
+
+    def stop(self):
+        self._stop = True

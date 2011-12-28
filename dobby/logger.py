@@ -23,7 +23,8 @@ def initLogging(quiet, verbose, config):
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     handlers = []
-    handlers.append(logging.handlers.RotatingFileHandler(config['file'], config['max_bytes'], config['backup_count'], encoding='utf-8'))
+    if config['file']:
+        handlers.append(logging.handlers.RotatingFileHandler(config['file'], config['max_bytes'], config['backup_count'], encoding='utf-8'))
     if not quiet:
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setFormatter(logging.Formatter())

@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
+import logger
 from elixir import metadata, setup_all, create_all
-from models import *
+from model import *
 
 metadata.bind = "sqlite:///test.db"
 metadata.bind.echo = True
 
+logger = logger.getLogger(__name__)
 
 def initDb():
+    logger.info(u'Initializing database...')
     setup_all()
     create_all()

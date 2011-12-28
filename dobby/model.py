@@ -1,6 +1,11 @@
 # Copyright 2011 Antoine Bertin <diaoulael@gmail.com>
 #
 # This file is part of Dobby.
+from elixir.entity import Entity
+from elixir.fields import Field
+from elixir.options import using_options
+from elixir.relationships import ManyToMany
+from sqlalchemy.types import UnicodeText
 
 # Dobby is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,14 +23,11 @@
 __all__ = ['Sentence', 'Action', 'Weather', 'Say']
 
 
-from elixir.entity import Entity
-from elixir.fields import Field
-from elixir.options import using_options
-from sqlalchemy.types import UnicodeText
 
 
 class Sentence(Entity):
     text = Field(UnicodeText)
+    actions = ManyToMany('Action')
     
     def __repr__(self):
         return '<Sentence "%s">' % self.text
@@ -34,6 +36,10 @@ class Sentence(Entity):
 class Action(Entity):
     using_options(inheritance='multi')
     tts = Field(UnicodeText)
+    sentences = ManyToMany('Sentence')
+    
+    def __repr__(self):
+        return '<Action "%s">' % self.tts
 
 
 class Weather(Action):
