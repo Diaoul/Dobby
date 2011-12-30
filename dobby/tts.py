@@ -15,21 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
-import config
 import speechd
 
-client = None
+# States
+IDLE, SPEAKING = range(2)
 
-def initTTS():
-    global client
-    client = speechd.SSIPClient('Dobby')
-    client.set_output_module(config['TTS']['engine'])
-    client.set_voice(config['TTS']['voice'])
-    client.set_language(config['TTS']['language'])
-    client.set_volume(config['TTS']['volume'])
-    client.set_rate(config['TTS']['rate'])
-    client.set_pitch(config['TTS']['pitch'])
-    client.set_punctuation(speechd.PunctuationMode.SOME)
-
-def closeTTS():
-    client.close()
+class TTSClient(object):
+    """Client for the TTS using speechd"""
+    def __init__(self, name, config):
+        self.state = IDLE
+        self.client = speechd.SSIPClient(name)
+        self.client.set_output_module(config['engine'])
+        self.client.set_voice(config['voice'])
+        self.client.set_language(config['language'])
+        self.client.set_volume(config['volume'])
+        self.client.set_rate(config['rate'])
+        self.client.set_pitch(config['pitch'])
+        self.client.set_punctuation(speechd.PunctuationMode.SOME)
+        
+    def speak(self, text):
+        #TODO callbacks for BEGIN and END that sets the TTSClient state
+        self.client.speak(text, callback=None, event_types=None)
+        self.state = SPEAKING
