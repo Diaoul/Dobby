@@ -32,7 +32,7 @@ class Block(object):
         self.length += amount
 
     def __repr__(self):
-        return '<' + str(type(self)) + ': length=%d>' % self.length
+        return '<' + self.__class__.__name__ + ' "%d">' % self.length
 
 
 class QuietBlock(Block):
@@ -131,10 +131,8 @@ class Clapper(Trigger):
             rms = self.get_rms(data_block)
             # Detect the type of block
             if rms > threshold:
-                print "Noisy"
                 sequence.append(NoisyBlock())
             else:            
-                print "Quiet"
                 sequence.append(QuietBlock())
             # Trigger an event and reset if the sequence matches the pattern
             if self.pattern.match(sequence):
@@ -157,21 +155,3 @@ class Clapper(Trigger):
             n = float(sample) / 32768
             sum_squares += n * n
         return math.sqrt(sum_squares / count)
-
-
-if __name__ == "__main__":
-    #TODO: Use a unittest for that.
-    # For testing purpose only, change the device_index to fit your configuration
-    #pa = pyaudio.PyAudio()
-    #for i in range(pa.get_device_count()):
-    #    print pa.get_device_info_by_index(i)
-    q = Queue()
-    # This patterns defines a QuietBlock of 1*0.25s min (no max) followed by a NoisyBlock of 1*0.25s min and 3*0.25s max, etc.
-    p = Pattern([QuietPattern(1), NoisyPattern(1, 3), QuietPattern(1, 2), NoisyPattern(1, 3), QuietPattern(1)])
-    c = Clapper(event_queue=q, device_index=8, pattern=p, block_time=0.25)
-    c.start()
-    import time
-    time.sleep(4) # let it live for a few seconds only :evil:
-    c.stop()
-    c.join()
-    print q.qsize()
