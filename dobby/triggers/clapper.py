@@ -16,7 +16,6 @@
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import deque
-from Queue import Queue
 from base import Trigger
 import math
 import pyaudio
@@ -136,7 +135,6 @@ class Clapper(Trigger):
                 sequence.append(QuietBlock())
             # Trigger an event and reset if the sequence matches the pattern
             if self.pattern.match(sequence):
-                print repr(sequence)
                 self.event_queue.put(ClapperEvent())
                 sequence.clear()
         # Close
