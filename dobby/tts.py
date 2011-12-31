@@ -16,6 +16,7 @@
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
 import speechd
+import time
 
 # States
 IDLE, SPEAKING = range(2)
@@ -32,8 +33,23 @@ class TTSClient(object):
         self.client.set_rate(config['rate'])
         self.client.set_pitch(config['pitch'])
         self.client.set_punctuation(speechd.PunctuationMode.SOME)
+    
+    def terminate(self):
+        self.client.close()
+
+    def set_engine(self, engine):
+        self.client.set_output_module(engine)
         
     def speak(self, text):
-        #TODO callbacks for BEGIN and END that sets the TTSClient state
-        self.client.speak(text, callback=None, event_types=None)
+        self.client.speak(text, callback=self._callback, event_types=(speechd.CallbackType.END))
         self.state = SPEAKING
+
+    def wait(self, timeout=10, poll=0.1):
+        i = 0
+        while self.state == SPEAKING and i <= timeout / poll:
+            time.sleep(poll)
+            i += 1
+
+    def _callback(self, event_type):
+        if event_type == speechd.CallbackType.END:
+            self.state = IDLE
