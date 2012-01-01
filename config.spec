@@ -15,5 +15,5 @@ rate = integer(-100, 100, default=0)
 pitch = integer(-100, 100, default=0)
 
 [Trigger]
-trigger = option('clapper', 'dobby', default='dobby')
+triggers = option_list('clapper', 'dobby', default=list('clapper'))
 [[Clapper]]

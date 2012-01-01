@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from configobj import ConfigObj, flatten_errors
-from validate import Validator
+from validate import Validator, VdtValueError, VdtTypeError
 import sys
 
 
 def initConfig(path='config.ini'):
     config = ConfigObj(path, configspec='config.spec', encoding='utf-8')
-    results = config.validate(Validator(), copy=True)
+    vtor = Validator({'option_list': is_option_list})
+    results = config.validate(vtor, copy=True)
     if results != True:
         for (section_list, key, _) in flatten_errors(config, results):
             if key is not None:
@@ -30,3 +31,11 @@ def initConfig(path='config.ini'):
                 sys.stderr.write('The following section was missing: %s\n' % ', '.join(section_list))
             return False
     return config
+
+def is_option_list(value, *args):
+    if not isinstance(value, list):
+        raise VdtTypeError(value)
+    for v in value:
+        if v not in args:
+            raise VdtValueError(v)
+    return value
