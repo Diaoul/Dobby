@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from dobby.triggers.clapper import Pattern, QuietPattern, NoisyPattern, Clapper
+from dobby.models.actions import wunderground
 import Queue
 import dobby.tts
 import logging
@@ -24,7 +25,7 @@ import unittest
 
 logging.getLogger().setLevel(logging.DEBUG)
 
-
+'''
 class TTSClientTestCase(unittest.TestCase):
     def setUp(self):
         self.config = {'engine': 'espeak', 'voice': 'MALE1', 'language': 'en', 'volume': 100, 'rate': 0, 'pitch': 0}
@@ -62,3 +63,7 @@ class ClapperTestCase(unittest.TestCase):
         time.sleep(4)  # let it live for a few seconds only :evil:
         self.clapper.stop()
         self.clapper.join()
+'''
+class WeatherUndergroundTestCase(unittest.TestCase):
+    def test_request(self):
+        wunderground.request('01b1334435fa449f', ['conditions', 'forecast'], 'France/Cergy-Pontoise')

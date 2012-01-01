@@ -1,27 +1,29 @@
 # Copyright 2011 Antoine Bertin <diaoulael@gmail.com>
 #
 # This file is part of Dobby.
-
+#
 # Dobby is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Dobby is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 import requests
 import json
 from urllib import quote
 
+
 AUTOCOMPLETE_URL = 'http://autocomplete.wunderground.com/aq?query={query}&format={format}&c={country}&h={hurricanes}&cities={cities}'
 API_URL = 'http://api.wunderground.com/api/{key}/{features}/q/{query}.{format}'
 FEATURES = ['geolookup', 'conditions', 'forecast', 'astronomy', 'radar', 'satellite', 'webcams', 'history',
             'alerts', 'hourly', 'hourly7day', 'forecast7day', 'yesterday', 'autocomplete', 'almanac', 'lang']
+
 
 def autocomplete(query, country=None, hurricanes=False, cities=True, timeout=5):
     data = {}
@@ -47,15 +49,11 @@ def request(key, features, query, timeout=5):
 def _unicode(string):
     """Try to convert a string to unicode using different encodings"""
     fallback = 'utf-8'
-    result = None
     for encoding in ['utf-8', 'latin1']:
         try:
             result = unicode(string, encoding)
             return result
         except UnicodeDecodeError:
-            pass 
-    return unicode(string, fallback, 'replace')
-
-if __name__ == '__main__':
-    #print autocomplete('Cergy')
-    print request('01b1334435fa449f', ['conditions', 'forecast'], 'France/Cergy-Pontoise')
+            pass
+    result = unicode(string, fallback, 'replace') 
+    return result 

@@ -1,46 +1,38 @@
 # Copyright 2011 Antoine Bertin <diaoulael@gmail.com>
 #
 # This file is part of Dobby.
-
+#
 # Dobby is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Dobby is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-
-__all__ = ['WeatherAction']
-
-
-from .. import Base
+from . import Base
 from sqlalchemy.orm import relationship
-from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer, UnicodeText, String
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.types import Integer
 
 
-class Action(Base):
-    __tablename__ = 'actions'
-    id = Column(Integer, primary_key=True)
-    tts = Column(UnicodeText)
+class Association(Base):
+    __tablename__ = 'associations'
+    sentence_id = Column(Integer, ForeignKey('sentences.id'), primary_key=True)
+    action_id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
+    order = Column(Integer)
 
-    discriminator = Column('type', String(50))
-    __mapper_args__ = {'polymorphic_on': discriminator}
+    sentence = relationship('Sentence', back_populates='associations')
+    action = relationship('Action', back_populates='associations')
 
-    associations = relationship('Association', back_populates='action')
-
-    def __init__(self, tts):
-        self.tts = tts
-        self.data = {}
-
-    def format_tts(self):
-        """Format the tts string with the available data"""
-        return self.tts.format(self.data)
+    def __init__(self, action=None, sentence=None, order=None):
+        self.sentence = sentence
+        self.action = action
+        self.order = order
 
     def __repr__(self):
-        return '<' + self.__class__.__name__ + '("%s")>' % self.tts
+        return '<Association("%d")>' % (self.order or 0)
