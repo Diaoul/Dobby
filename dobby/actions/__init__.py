@@ -15,12 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
-from model import Base, engine
-from actions import WeatherAction
-import logger
+__all__ = ['WeatherAction']
 
-logger = logger.getLogger(__name__)
-
-def initDb():
-    logger.info(u'Initializing database')
-    Base.metadata.create_all(engine)
+from weather import WeatherAction
