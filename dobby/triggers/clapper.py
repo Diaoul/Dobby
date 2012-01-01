@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
+from . import Trigger, TriggerEvent
 from collections import deque
-from base import Trigger
 import math
 import pyaudio
 import struct
@@ -100,7 +100,7 @@ class Pattern(list):
         return True
 
 
-class ClapperEvent(object):
+class ClapperEvent(TriggerEvent):
     """Event put in the event_queue of the Clapper"""
     pass
 

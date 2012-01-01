@@ -14,12 +14,16 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-
-from model import Base, engine
-from actions import WeatherAction
+from models import Base
+from models.sentence import Sentence
+from models.association import Association
+from models.actions import Action
+from models.actions.weather import WeatherAction
+from sqlalchemy.engine import create_engine
 import logger
 
 logger = logger.getLogger(__name__)
+engine = create_engine('sqlite:///dobby.db', echo=True)
 
 def initDb():
     logger.info(u'Initializing database')
