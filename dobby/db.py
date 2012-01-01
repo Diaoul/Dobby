@@ -26,7 +26,7 @@ import logger
 
 logger = logger.getLogger(__name__)
 engine = create_engine('sqlite:///dobby.db', echo=True)
-session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine)
 
 
 def initDb():
