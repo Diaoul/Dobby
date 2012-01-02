@@ -16,10 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 
+from Queue import Queue
 from dobby import infos
 from dobby.config import initConfig
+from dobby.core import initTriggers
 from dobby.db import initDb
 from dobby.logger import initLogging, getLogger
+from dobby.triggers.clapper import Clapper, Pattern, QuietPattern, NoisyPattern
 import argparse
 
 
@@ -45,6 +48,12 @@ def main():
     
     # Init db
     initDb()
+
+    # Start triggers
+    queue = Queue()
+    triggers = initTriggers(queue, config['Trigger'])
+    
+    # Start dobby
     
     config.write()
 
