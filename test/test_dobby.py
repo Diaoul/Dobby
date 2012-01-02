@@ -25,7 +25,7 @@ import unittest
 
 logging.getLogger().setLevel(logging.DEBUG)
 
-'''
+
 class TTSClientTestCase(unittest.TestCase):
     def setUp(self):
         self.config = {'engine': 'espeak', 'voice': 'MALE1', 'language': 'en', 'volume': 100, 'rate': 0, 'pitch': 0}
@@ -63,7 +63,8 @@ class ClapperTestCase(unittest.TestCase):
         time.sleep(4)  # let it live for a few seconds only :evil:
         self.clapper.stop()
         self.clapper.join()
-'''
+
 class WeatherUndergroundTestCase(unittest.TestCase):
     def test_request(self):
-        wunderground.request('01b1334435fa449f', ['conditions', 'forecast'], 'France/Cergy-Pontoise')
+        results = wunderground.request('01b1334435fa449f', ['conditions', 'forecast'], 'France/Cergy-Pontoise')
+        self.assertTrue(len(results) > 0)
