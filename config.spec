@@ -17,3 +17,5 @@ pitch = integer(-100, 100, default=0)
 [Trigger]
 triggers = option_list('clapper', 'dobby', default=list('clapper'))
 [[Clapper]]
+device_index = integer(0, 20, default=8)
+block_time = float(0, 2, default=0.1)
