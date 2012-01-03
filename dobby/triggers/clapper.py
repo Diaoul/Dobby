@@ -16,9 +16,13 @@
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from . import Trigger, TriggerEvent
 from collections import deque
+import logging
 import math
 import pyaudio
 import struct
+
+
+logger = logging.getLogger(__name__)
 
 
 class Block(object):
@@ -134,6 +138,7 @@ class Clapper(Trigger):
                 sequence.append(QuietBlock())
             # Trigger an event and reset if the sequence matches the pattern
             if self.pattern.match(sequence):
+                logger.debug(u'Pattern matched the sequence %r' % sequence)
                 self.event_queue.put(ClapperEvent())
                 sequence.clear()
         # Close

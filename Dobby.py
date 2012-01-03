@@ -19,10 +19,10 @@
 from Queue import Queue
 from dobby import infos
 from dobby.config import initConfig
-from dobby.core import initTriggers
-from dobby.db import initDb
+from dobby.core import initTriggers, Dobby
+from dobby.db import initDb, Session
 from dobby.logger import initLogging, getLogger
-from dobby.triggers.clapper import Clapper, Pattern, QuietPattern, NoisyPattern
+from dobby.tts import TTSClient
 import argparse
 
 
@@ -53,7 +53,9 @@ def main():
     queue = Queue()
     triggers = initTriggers(queue, config['Trigger'])
     
-    # Start dobby
+    # Start Dobby
+    dobby = Dobby(queue, Session(), TTSClient('Dobby', config['TTS']))
+    dobby.start()
     
     config.write()
 

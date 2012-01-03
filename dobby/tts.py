@@ -26,9 +26,9 @@ class TTSClient(object):
     def __init__(self, name, config):
         self.state = IDLE
         self.client = speechd.SSIPClient(name)
-        self.client.set_output_module(config['engine'])
-        self.client.set_voice(config['voice'])
-        self.client.set_language(config['language'])
+        self.client.set_output_module(str(config['engine']))
+        self.client.set_voice(str(config['voice']))
+        self.client.set_language(str(config['language']))
         self.client.set_volume(config['volume'])
         self.client.set_rate(config['rate'])
         self.client.set_pitch(config['pitch'])

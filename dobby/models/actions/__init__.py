@@ -24,7 +24,6 @@ class Action(Base):
     __tablename__ = 'actions'
     id = Column(Integer, primary_key=True)
     tts = Column(UnicodeText)
-
     discriminator = Column('type', String(50))
     __mapper_args__ = {'polymorphic_on': discriminator}
 
@@ -32,11 +31,11 @@ class Action(Base):
 
     def __init__(self, tts):
         self.tts = tts
-        self.data = {}
 
-    def format_tts(self):
+    @property
+    def formated_tts(self):
         """Format the tts string with the available data"""
-        return self.tts.format(self.data)
+        return self.tts
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + '("%s")>' % self.tts

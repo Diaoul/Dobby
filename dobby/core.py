@@ -14,10 +14,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from models.actions import Action
 from models.sentence import Sentence
+from sqlalchemy.orm import joinedload
 from triggers.clapper import Pattern, QuietPattern, NoisyPattern, Clapper
+import logging
 import threading
+
+logger = logging.getLogger(__name__)
 
 
 def initTriggers(queue, config):
@@ -31,13 +34,28 @@ def initTriggers(queue, config):
 
 
 class Dobby(threading.Thread):
-    def __init__(self, event_queue, session):
+    def __init__(self, event_queue, session, tts_client):
         super(Dobby, self).__init__()
         self.event_queue = event_queue
         self.session = session
+        self.tts_client = tts_client
+        self._stop = False
+
+    def stop(self):
+        self._stop = True
         
     def run(self):
-        while 1:
+        while not self._stop:
             event = self.event_queue.get()
-            #TODO: Sentence <-> Actions relation
-            actions = self.session.query(Action).with_polymorphic('*').filter(Sentence.id == 1)
+            logger.debug(u'Got an event!')
+            #TODO: Sentence recognition
+            recognized_sentence = u'Recognized text'
+            # Load the sentence with its actions
+            #sentence = self.session.query(Sentence).options(joinedload(Sentence.actions)).with_polymorphic('*').filter(Sentence.text == recognized_sentence).first()
+            # Or just load the sentence, we'll actions will be dynamically loaded
+            sentence = self.session.query(Sentence).filter(Sentence.text == recognized_sentence).first()
+            print repr(sentence.actions)
+            for action_number in sorted(sentence.actions.keys()):
+                #TODO: Add an abstract method retrieve for data with an action state and make a formated_tts property that retrieve what it needs
+                #TODO: Make a configurable error TTS to say
+                self.tts_client.speak(sentence.actions[action_number].formated_tts)

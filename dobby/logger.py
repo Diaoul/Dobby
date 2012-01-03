@@ -27,10 +27,11 @@ def initLogging(quiet, verbose, config):
     if not quiet:
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setFormatter(logging.Formatter())
+        #FIXME: DEBUG on both to ease... debug
         if verbose:
             stream_handler.setLevel(logging.DEBUG)
         else:
-            stream_handler.setLevel(logging.INFO)
+            stream_handler.setLevel(logging.DEBUG)
             handlers.append(stream_handler)
     root.handlers = handlers
 
