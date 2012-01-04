@@ -15,7 +15,14 @@ rate = integer(-100, 100, default=0)
 pitch = integer(-100, 100, default=0)
 
 [Trigger]
-triggers = option_list('clapper', 'dobby', default=list('clapper'))
+triggers = option_list('clapper', 'julius', default=list('julius'))
 [[Clapper]]
 device_index = integer(0, 20, default=8)
 block_time = float(0, 2, default=0.1)
+[[Julius]]
+sentence = string(default='dial one')
+min_score = float(0, default=3000.0)
+host = string(default='localhost')
+port = integer(1000, default=10500)
+encoding = string(default='utf-8')
+action = boolean(default=True)
