@@ -29,3 +29,8 @@ class Trigger(threading.Thread):
 
 class TriggerEvent(object):
     pass
+
+
+class TriggerActionEvent(object):
+    def __init__(self, sentence):
+        self.sentence = sentence
