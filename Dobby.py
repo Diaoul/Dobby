@@ -21,12 +21,13 @@ from dobby import infos
 from dobby.config import initConfig
 from dobby.core import initTriggers, Dobby
 from dobby.db import initDb, Session
-from dobby.logger import initLogging, getLogger
+from dobby.logger import initLogging
 from dobby.tts import TTSClient
 import argparse
+import logging
 
 
-logger = getLogger()
+logger = logging.getLogger()
 
 
 def main():

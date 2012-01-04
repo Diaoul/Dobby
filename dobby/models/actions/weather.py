@@ -15,13 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from . import Action
+from sqlalchemy.orm.mapper import reconstructor
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Integer, String
+import logging
 import wunderground
 
 
 API_KEY = '01b1334435fa449f'
-
+logger = logging.getLogger(__name__)
 
 class WeatherAction(Action):
     __tablename__ = 'weather_actions'
@@ -29,6 +31,15 @@ class WeatherAction(Action):
     id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
     query = Column(String(30))
 
-    def retreive(self):
-        """Retreive and store data from wunderground so it is used by format_tts""" 
-        self.data = wunderground.request(API_KEY, ['conditions', 'forecast'], self.query)
+    #TODO: Put it also in __init__? For when not retreiving from database.
+    @reconstructor
+    def onload(self):
+        self.data = {}
+
+    @property
+    def formated_tts(self):
+        """Format the tts string with the available data"""
+        if not self.data:
+            self.data = wunderground.request(API_KEY, ['conditions', 'forecast'], self.query)
+            logger.debug(u'Retreived data: %r' % self.data)
+        return self.tts.format(**self.data)

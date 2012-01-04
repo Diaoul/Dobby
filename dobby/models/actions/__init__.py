@@ -29,9 +29,6 @@ class Action(Base):
 
     associations = relationship('Association', back_populates='action')
 
-    def __init__(self, tts):
-        self.tts = tts
-
     @property
     def formated_tts(self):
         """Format the tts string with the available data"""
