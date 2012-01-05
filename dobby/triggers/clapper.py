@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from . import Trigger, TriggerEvent
+from . import Trigger, RecordEvent
 from collections import deque
 import logging
 import math
@@ -103,11 +103,6 @@ class Pattern(list):
         return True
 
 
-class ClapperEvent(TriggerEvent):
-    """Event put in the event_queue of the Clapper"""
-    pass
-
-
 class Clapper(Trigger):
     """Analyze an audio source and put an event in the queue if the resulting Sequence of Block matches the Pattern"""
     def __init__(self, event_queue, device_index, pattern, threshold=0.020, channels=1, rate=44100, block_time=0.05):
@@ -139,8 +134,9 @@ class Clapper(Trigger):
             # Trigger an event and reset if the sequence matches the pattern
             if self.pattern.match(sequence):
                 logger.debug(u'Pattern matched the sequence %r' % sequence)
-                self.event_queue.put(ClapperEvent())
+                self.event_queue.put(RecordEvent())
                 sequence.clear()
+            self.event_queue.join()
         # Close
         stream.close()
         pa.terminate()

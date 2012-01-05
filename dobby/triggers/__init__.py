@@ -27,10 +27,10 @@ class Trigger(threading.Thread):
         self._stop = True
 
 
-class TriggerEvent(object):
+class RecognitionEvent(object):
     pass
 
 
-class TriggerActionEvent(object):
+class ActionEvent(object):
     def __init__(self, sentence):
         self.sentence = sentence

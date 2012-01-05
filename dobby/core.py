@@ -16,6 +16,7 @@
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from models.sentence import Sentence
 from sqlalchemy.orm import joinedload
+from triggers import ActionEvent, RecognitionEvent
 from triggers.clapper import Pattern, QuietPattern, NoisyPattern, Clapper
 from triggers.julius import Julius
 import logging
@@ -42,11 +43,12 @@ def initTriggers(queue, config):
 
 
 class Dobby(threading.Thread):
-    def __init__(self, event_queue, session, tts_client):
+    def __init__(self, event_queue, session, tts_client, recognizer):
         super(Dobby, self).__init__()
         self.event_queue = event_queue
         self.session = session
         self.tts_client = tts_client
+        self.recognizer = recognizer
         self._stop = False
 
     def stop(self):
@@ -54,17 +56,26 @@ class Dobby(threading.Thread):
         
     def run(self):
         while not self._stop:
+            # Get the event from the queue
             event = self.event_queue.get()
-            logger.debug(u'Got an event!')
-            #TODO: Sentence recognition
-            #recognized_sentence = u'Recognized text'
-            recognized_sentence = event.sentence
-            # Load the sentence with its actions
+            
+            # Fire an Action directly if the event is an ActionEvent
+            if isinstance(event, ActionEvent):
+                logger.debug(u'ActionEvent catched with sentence "%s"' % event.sentence)
+                sentence = self.session.query(Sentence).filter(Sentence.text == event.sentence).first()
+            
+            # Launch recognition and analyze the first sentences (max_sentences)
+            elif isinstance(event, RecognitionEvent):
+                logger.debug(u'RecognizeEvent catched')
+                for _ in range(self.max_sentences):
+                    sentence_text = self.recognizer.recognize()
+                    sentence = self.session.query(Sentence).filter(Sentence.text == sentence_text).first()
+                    if sentence:
+                        break
+
             #sentence = self.session.query(Sentence).options(joinedload(Sentence.actions)).with_polymorphic('*').filter(Sentence.text == recognized_sentence).first()
-            # Or just load the sentence, we'll actions will be dynamically loaded
-            sentence = self.session.query(Sentence).filter(Sentence.text == recognized_sentence).first()
+            # Loop over the sentence's actions in the correct order and execute them
             for action_number in sorted(sentence.actions.keys()):
-                #TODO: Add an abstract method retrieve for data with an action state and make a formated_tts property that retrieve what it needs
                 #TODO: Make a configurable error TTS to say
                 self.tts_client.speak(sentence.actions[action_number].formated_tts)
             self.event_queue.task_done()

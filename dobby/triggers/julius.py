@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from . import Trigger, TriggerEvent, TriggerActionEvent
+from . import Trigger, RecordEvent, ActionEvent
 from .. import pyjulius
 import logging
 
@@ -38,13 +38,9 @@ class Julius(Trigger):
             recog = self.client.sentence()
             if unicode(recog) == self.sentence and abs(recog.score) > self.min_score:
                 logger.debug(u'Julius sentence "%s" matched with score %f' % (recog, abs(recog.score)))
-                self.event_queue.put(JuliusEvent)
+                self.event_queue.put(RecordEvent())
             elif self.action and unicode(recog).startswith(self.sentence) and abs(recog.score) > self.min_score:
                 action_sentence = unicode(recog)[len(self.sentence) + 1:]
                 logger.debug(u'Julius sentence "%s" is in action "%s" !' % (recog, action_sentence))
-                self.event_queue.put(TriggerActionEvent(action_sentence))
+                self.event_queue.put(ActionEvent(action_sentence))
         self.client.disconnect()
-
-
-class JuliusEvent(TriggerEvent):
-    pass
