@@ -18,19 +18,25 @@ from xml.etree.ElementTree import XML
 import re
 import socket
 
+
+CONNECTED, DISCONNECTED = range(2)
+
 class Client(object):
     def __init__(self, host=None, port=None, encoding=None):
         self.host = host or 'localhost'
         self.port = port or 10500
         self.encoding = encoding or 'utf-8'
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.state = DISCONNECTED
     
     def connect(self):
         self.sock.connect((self.host, self.port))
+        self.state = CONNECTED
 
     def disconnect(self):
         self.sock.shutdown()
         self.sock.close()
+        self.state = DISCONNECTED
 
     def _readline(self):
         line = ''
