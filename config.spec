@@ -1,5 +1,7 @@
 [General]
-welcome_message = boolean(default=True)
+welcome_message = string(default='I am ready to serve you, master.')
+failed_message = string(default='I did not understand.')
+recognition_timeout = integer(0, 60, default=5)
 
 [Logging]
 file = string(default='dobby.log')
@@ -14,15 +16,22 @@ volume = integer(-100, 100, default=100)
 rate = integer(-100, 100, default=0)
 pitch = integer(-100, 100, default=0)
 
+[Recognizer]
+recognizer = option('julius', default='julius')
+
+[[Julius]]
+host = string(default='localhost')
+port = integer(0, default=10500)
+encoding = string(default='utf-8')
+min_score = float(0, default=3000.0)
+
 [Trigger]
 triggers = option_list('clapper', 'julius', default=list('julius'))
+
 [[Clapper]]
 device_index = integer(0, 20, default=8)
 block_time = float(0, 2, default=0.1)
+
 [[Julius]]
-sentence = string(default='dial one')
-min_score = float(0, default=3000.0)
-host = string(default='localhost')
-port = integer(1000, default=10500)
-encoding = string(default='utf-8')
+sentence = string(default='dobby')
 action = boolean(default=True)

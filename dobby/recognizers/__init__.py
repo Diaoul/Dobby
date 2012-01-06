@@ -15,16 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 import abc
+import threading
 
 
-class Recognizer(object):
-    __metaclass__ = abc.ABCMeta
+class Recognizer(threading.Thread):
+    def __init__(self):
+        super(Recognizer, self).__init__()
+        self.queues = []
+        self._stop = False
 
-    def __init__(self, max_sentences, timeout):
-        self.max_sentences = max_sentences
-        self.timeout = timeout
+    def stop(self):
+        self._stop = True
 
-    @abc.abstractmethod
-    def recognize(self):
-        """Launch speech recognition using parameters"""
-        pass
+    def subscribe(self, queue):
+        self.queues.append(queue)
+
+    def unsubscribe(self, queue):
+        self.queues.remove(queue)

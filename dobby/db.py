@@ -18,7 +18,8 @@ from models import Base
 from models.sentence import Sentence
 from models.association import Association
 from models.actions import Action
-from models.actions.weather import WeatherAction
+from models.actions.weather import Weather
+from models.actions.datetime import Datetime
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
 import logger

@@ -18,11 +18,10 @@
 
 from Queue import Queue
 from dobby import infos
+from dobby.app import initRecognizer, initTriggers, initTTS, initController
 from dobby.config import initConfig
-from dobby.core import initTriggers, Dobby
-from dobby.db import initDb, Session
+from dobby.db import initDb
 from dobby.logger import initLogging
-from dobby.tts import TTSClient
 import argparse
 import logging
 
@@ -45,20 +44,36 @@ def main():
     config = initConfig(args.config_file)
     
     # Init logging
-    initLogging(args.quiet, args.verbose, config['Logging'])
+    #FIXME: args.verbose instead of True
+    initLogging(args.quiet, True, config['Logging'])
     
     # Init db
     initDb()
-
-    # Start triggers
-    queue = Queue()
-    triggers = initTriggers(queue, config['Trigger'])
     
-    # Start Dobby
-    dobby = Dobby(queue, Session(), TTSClient('Dobby', config['TTS']))
-    dobby.start()
+    # Init recognizer
+    recognizer = initRecognizer(config['Recognizer'])
+
+    # Init triggers
+    event_queue = Queue()
+    triggers = initTriggers(event_queue, recognizer, config['Trigger'])
+
+    # Init tts
+    action_queue = Queue()
+    tts = initTTS(action_queue, config['TTS'])
+
+    # Start controller
+    controller = initController(event_queue, action_queue, recognizer, config['General'])
+    
+    # Welcome message
+    if config['General']['welcome_message']:
+        action_queue.put(config['General']['welcome_message'])
     
     config.write()
 
 if __name__ == '__main__':
+#    import pyaudio
+#    pa = pyaudio.PyAudio()
+#    for i in range(pa.get_device_count()):
+#        infos = pa.get_device_info_by_index(i)
+#        print infos['name'] + "\t" + str(infos['index'])
     main()

@@ -25,7 +25,7 @@ import wunderground
 API_KEY = '01b1334435fa449f'
 logger = logging.getLogger(__name__)
 
-class WeatherAction(Action):
+class Weather(Action):
     __tablename__ = 'weather_actions'
     __mapper_args__ = {'polymorphic_identity': 'weather'}
     id = Column(Integer, ForeignKey('actions.id'), primary_key=True)

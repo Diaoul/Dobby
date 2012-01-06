@@ -21,11 +21,12 @@ import socket
 
 CONNECTED, DISCONNECTED = range(2)
 
+
 class Client(object):
-    def __init__(self, host=None, port=None, encoding=None):
-        self.host = host or 'localhost'
-        self.port = port or 10500
-        self.encoding = encoding or 'utf-8'
+    def __init__(self, host='localhost', port=10500, encoding='utf-8'):
+        self.host = host
+        self.port = port
+        self.encoding = encoding
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.state = DISCONNECTED
     
@@ -37,6 +38,9 @@ class Client(object):
         self.sock.shutdown()
         self.sock.close()
         self.state = DISCONNECTED
+
+    def send(self, data):
+        self.sock.send(data)
 
     def _readline(self):
         line = ''
@@ -56,8 +60,16 @@ class Client(object):
 
     def _readxml(self):
         block = re.sub(r'<(/?)s>', r'&lt;\1s&gt;', self._readblock())
-        element = XML(block)
-        return element
+        return XML(block)
+
+    def empty(self):
+        self.sock.setblocking(False)
+        while 1:
+            try:
+                self.sock.recv(4096)
+            except socket.error:
+                break
+        self.sock.setblocking(True)
 
     def etree(self, tag):
         xml = self._readxml()
@@ -65,7 +77,7 @@ class Client(object):
             xml = self._readxml()
         return xml
 
-    def sentence(self):
+    def recognize(self):
         xml = self.etree('RECOGOUT')
         shypo = xml.find('SHYPO')
         return Sentence.from_shypo(shypo, self.encoding)
@@ -111,4 +123,4 @@ if __name__ == '__main__':
     c = Client()
     c.connect()
     while 1:
-        print str(c.sentence())
+        print str(c.recognize())
