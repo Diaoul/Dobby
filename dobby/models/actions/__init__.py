@@ -21,17 +21,38 @@ from sqlalchemy.types import Integer, UnicodeText, String
 
 
 class Action(Base):
+    """Action base model that holds the text-to-speech
+
+    :param \*\*kwargs: can set all attributes
+
+    .. attribute:: id
+
+        Action id
+
+    .. attribute:: tts
+
+        To-be-formatted or formatted text-to-speech
+
+    .. attribute:: associations
+
+        Link to a list of :class:`~dobby.models.association.Association` objects by following the
+        database relationship
+
+    """
     __tablename__ = 'actions'
     id = Column(Integer, primary_key=True)
     tts = Column(UnicodeText)
+    
     discriminator = Column('type', String(50))
     __mapper_args__ = {'polymorphic_on': discriminator}
 
     associations = relationship('Association', back_populates='action')
 
-    @property
-    def formated_tts(self):
-        """Format the tts string with the available data"""
+    def format_tts(self):
+        """Format the :attr:`tts` into a valid text-to-speech
+        for :class:`~dobby.tts.TTS`
+
+        """
         return self.tts
 
     def __repr__(self):

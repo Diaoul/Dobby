@@ -31,5 +31,8 @@ pip-log.txt
 .pydevproject
 .settings
 
+#Sphinx
+docs/_build
+
 #Dobby
 config.ini

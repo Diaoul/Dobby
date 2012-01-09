@@ -21,6 +21,32 @@ from sqlalchemy.types import Integer
 
 
 class Association(Base):
+    """Association model that represents an association between a :class:`~dobby.models.sentence.Sentence`
+    and a :class:`~dobby.models.actions.Action` with a special :attr:`order`
+
+    :param \*\*kwargs: can set all attributes
+
+    .. attribute:: sentence_id
+
+        Foreing key to :attr:`Sentence.id <dobby.models.sentence.Sentence.id>`
+
+    .. attribute:: action_id
+
+        Foreing key to :attr:`Action.id <dobby.models.actions.Action.id>`
+
+    .. attribute:: order
+
+        Order in which the :class:`~dobby.models.actions.Action` objects of a :class:`~dobby.models.sentence.Sentence` should be executed
+
+    .. attribute:: sentence
+
+        Direct access to the :class:`~dobby.models.sentence.Sentence` object
+
+    .. attribute:: action
+
+         Direct access to the :class:`~dobby.models.actions.Action` object
+
+    """
     __tablename__ = 'associations'
     sentence_id = Column(Integer, ForeignKey('sentences.id'), primary_key=True)
     action_id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
@@ -28,11 +54,6 @@ class Association(Base):
 
     sentence = relationship('Sentence', back_populates='associations')
     action = relationship('Action', back_populates='associations')
-
-    def __init__(self, action=None, sentence=None, order=None):
-        self.sentence = sentence
-        self.action = action
-        self.order = order
 
     def __repr__(self):
         return '<Association("%d")>' % (self.order or 0)

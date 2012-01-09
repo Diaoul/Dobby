@@ -18,10 +18,9 @@
 
 from Queue import Queue
 from dobby import infos
-from dobby.app import initRecognizer, initTriggers, initTTS, initController
+from dobby.app import initRecognizer, initTriggers, initTTS, initController, initLogging
 from dobby.config import initConfig
 from dobby.db import initDb
-from dobby.logger import initLogging
 import argparse
 import logging
 

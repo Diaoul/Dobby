@@ -24,6 +24,27 @@ from sqlalchemy.types import Integer, UnicodeText
 
 
 class Sentence(Base):
+    """Sentence model that represents a sentence to be detected by a :class:`~dobby.recognizers.Recognizer`
+
+    :param \*\*kwargs: can set all attributes
+
+    .. attribute:: id
+
+        Sentence id
+
+    .. attribute:: text
+
+        Text to be detected
+
+    .. attribute:: associations
+
+        Relationship to all related :class:`~dobby.models.association.Association` objects
+
+    .. attribute:: actions
+
+        Relationship to all related :class:`~dobby.models.actions.Action` objects in the right :attr:`~dobby.models.association.Association.order`
+
+    """
     __tablename__ = 'sentences'
     id = Column(Integer, primary_key=True)
     text = Column(UnicodeText)

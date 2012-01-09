@@ -18,19 +18,39 @@ import threading
 
 
 class Trigger(threading.Thread):
+    """Threaded Trigger base class. A trigger will :meth:`raise <raise_event>` a :class:`RecognitionEvent` or an :class:`ActionEvent`
+    when the detection is successful
+
+    :param Queue.Queue event_queue: queue where to put the events
+    
+    """
     def __init__(self, event_queue):
         super(Trigger, self).__init__()
         self._stop = False
         self.event_queue = event_queue
 
     def stop(self):
+        """Stop the thread"""
         self._stop = True
+
+    def raise_event(self, event):
+        self.queue.put(event)
 
 
 class RecognitionEvent(object):
+    """A RecognitionEvent indicates that the recognition can be launched to
+    analyze the next sentence
+
+    """
     pass
 
 
 class ActionEvent(object):
+    """An ActionEvent indicates that this is not necessary to launch the recognition
+    and provides the recognized sentence
+
+    :param string sentence: the recognized sentence
+
+    """
     def __init__(self, sentence):
         self.sentence = sentence

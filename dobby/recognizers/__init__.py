@@ -19,16 +19,44 @@ import threading
 
 
 class Recognizer(threading.Thread):
+    """Threaded Recognizer base class. A queue can be subscribed to the Recognizer and
+    hence, receive recognized :class:`pyjulius.Sentence` objects
+
+    .. attribute:: subscribers
+        List of subscribers
+
+    """
     def __init__(self):
         super(Recognizer, self).__init__()
-        self.queues = []
+        self.subscribers = []
         self._stop = False
 
     def stop(self):
+        """Stop the thread"""
         self._stop = True
 
-    def subscribe(self, queue):
-        self.queues.append(queue)
+    def subscribe(self, subscriber):
+        """Add a queue to the Recognizer's subscribers list. A subscriber will receive
+        :meth:`published <dobby.recognizers.Recognizer.publish>` :class:`pyjulius.Sentence` objects
 
-    def unsubscribe(self, queue):
-        self.queues.remove(queue)
+        :param Queue.Queue subscriber: subscriber to append
+
+        """
+        self.subscribers.append(subscriber)
+
+    def unsubscribe(self, subscriber):
+        """Remove a queue from the subscribers list
+        
+        :param Queue.Queue subscriber: subscriber to remove
+
+        """
+        self.subscribers.remove(subscriber)
+
+    def publish(self, sentence):
+        """Publish a recognized sentence to all subscribers
+
+        :param pyjulius.Sentence sentence: the recognized sentence
+
+        """
+        for subscriber in self.subscribers:
+            subscriber.put(sentence)

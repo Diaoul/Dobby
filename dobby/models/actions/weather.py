@@ -19,27 +19,47 @@ from sqlalchemy.orm.mapper import reconstructor
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Integer, String
 import logging
-import wunderground
+import pywunderground
 
 
 API_KEY = '01b1334435fa449f'
 logger = logging.getLogger(__name__)
 
+
 class Weather(Action):
+    """Weather Action retrieves the weather from `wunderground <http://www.wunderground.com/>`_
+
+    .. attribute:: query
+
+        Last part of the `l` parameter in an Autocomplete API response
+        For example if the `l` parameter is `/q/zmw:94125.1.99999`,
+        the value should be `zmw:94125.1.99999`
+
+        Refer to the `documentation of wunderground API <http://www.wunderground.com/weather/api/d/documentation.html>`_
+        in the Autocomplete API section for more details
+
+    :meth:`~dobby.models.actions.Action.format_tts` uses :func:`string.format` to format :attr:`~dobby.models.actions.Action.tts`
+    Data used is a dict fetched with :func:`wunderground.request` using :data:`wunderground.FEATURES`
+    *conditions* and *forecast*
+
+    To save ressources, the retrieved data is stored in the instance attribute data
+
+    """
     __tablename__ = 'weather_actions'
     __mapper_args__ = {'polymorphic_identity': 'weather'}
     id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
     query = Column(String(30))
 
-    #TODO: Put it also in __init__? For when not retreiving from database.
+    def __init__(self, **kwargs):
+        super(Weather, self).__init__(**kwargs)
+        self.data = {}
+
     @reconstructor
     def onload(self):
         self.data = {}
 
-    @property
-    def formated_tts(self):
-        """Format the tts string with the available data"""
+    def format_tts(self):
         if not self.data:
-            self.data = wunderground.request(API_KEY, ['conditions', 'forecast'], self.query)
+            self.data = pywunderground.request(API_KEY, ['conditions', 'forecast'], self.query)
             logger.debug(u'Retreived data: %r' % self.data)
         return self.tts.format(**self.data)

@@ -22,12 +22,20 @@ logger = logging.getLogger(__name__)
 
 
 class Julius(Recognizer):
+    """Julius Recognizer is based on `Julius speech recognition engine <http://julius.sourceforge.jp/en/>`_.
+    It uses :mod:`pyjulius` to connect to julius instance running in module mode
+    
+    :param pyjulius.Client client: the client instance
+    :param float min_score: minimum score under which the recognition result will be ignored
+
+    """
     def __init__(self, client, min_score):
         super(Julius, self).__init__()
         self.client = client
         self.min_score = min_score
 
     def run(self):
+        """Run the recognition and :meth:`~dobby.recognizers.Recognizer.publish` the recognized :class:`pyjulius.Sentence` objects"""
         self.client.connect()
         while not self._stop:
             recognition = self.client.recognize()
@@ -37,6 +45,5 @@ class Julius(Recognizer):
                 logger.debug(u'Rejected sentence "%s" with score %f < %f' % (sentence, score, self.min_score))
                 continue
             logger.debug(u'Firing recognition "%s" with score %f' % (sentence, score))
-            for q in self.queues:
-                q.put(recognition)
+            self.publish(recognition)
         self.client.disconnect()

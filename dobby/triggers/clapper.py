@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class Block(object):
-    """A block of audio data to insert in a Sequence"""
+    """A block of audio data"""
     def __init__(self, length=1):
         self.length = length
 
@@ -38,18 +38,19 @@ class Block(object):
 
 
 class QuietBlock(Block):
-    """Represent a quiet block of audio data"""
+    """A *quiet* block of audio data"""
     pass
 
 
 class NoisyBlock(Block):
-    """Represent a noisy block of audio data"""
+    """A *noisy* block of audio data"""
     pass
 
 
 class Sequence(deque):
     """The latest sequence of blocks read from an audio source
-    Adding a Block of the same type of the previous one will increase its length
+    Adding a class:`Block` of the same type of the previous one will increase its length
+
     """
     def append(self, x):
         if len(self) == 0:
@@ -65,7 +66,7 @@ class Sequence(deque):
 
 
 class PatternItem(object):
-    """A PatternItem is linked to a Block add will be used to validate it"""
+    """A PatternItem is linked to a class:`Block` add will be used to validate it"""
     validate = None
 
     def __init__(self, min_count=None, max_count=None):
@@ -83,17 +84,17 @@ class PatternItem(object):
 
 
 class QuietPattern(PatternItem):
-    """A QuietPattern validates a QuietBlock"""
+    """A QuietPattern validates a :class:`QuietBlock`"""
     validate = QuietBlock
 
 
 class NoisyPattern(PatternItem):
-    """A NoisyPattern validates a NoisyBlock"""
+    """A NoisyPattern validates a :class:`NoisyBlock`"""
     validate = NoisyBlock
 
 
 class Pattern(list):
-    """Enhanced list that is used to match a Sequence"""
+    """Enhanced list that is used to match a class:`Sequence`"""
     def match(self, sequence):
         if len(sequence) != len(self):
             return False
@@ -104,7 +105,17 @@ class Pattern(list):
 
 
 class Clapper(Trigger):
-    """Analyze an audio source and put an event in the queue if the resulting Sequence of Block matches the Pattern"""
+    """Analyze an audio source and put a :class:`~dobby.models.recognizers.RecognitionEvent` in the queue
+    if the resulting class:`Sequence` of class:`Block` matches the class:`Pattern`
+
+    :param integer device_index: device index as given per :class:`pyaudio.PyAudio`
+    :param Pattern pattern: pattern that has to be matched to :meth:`~dobby.models.recognizers.Recognizer.raise_event` the event
+    :param float threshold: level of input sound
+    :param integer channels: number of channels for the input
+    :param integer rage: rate of the input (in Hz)
+    :param float block_time: length of audio input chunks (in seconds)
+
+    """
     def __init__(self, event_queue, device_index, pattern, threshold, channels, rate, block_time):
         super(Clapper, self).__init__(event_queue)
         self.device_index = device_index
@@ -143,13 +154,17 @@ class Clapper(Trigger):
 
 
     def get_rms(self, data_block):
-        """Get the Root Mean Square of the block"""
+        """Root Mean Square of a block
+
+        :param data_block: data block as read from the audio input
+
+        """
         count = len(data_block) / 2
         shorts = struct.unpack('%dh' % count, data_block)
-        # iterate over the block to compute the sum of squares
+        # Iterate over the block to compute the sum of squares
         sum_squares = 0.0
         for sample in shorts:
-            # sample is a signed short in +/- 32768, normalize it to +/- 1.0
+            # Sample is a signed short in +/- 32768, normalize it to +/- 1.0
             n = float(sample) / 32768
             sum_squares += n * n
         return math.sqrt(sum_squares / count)

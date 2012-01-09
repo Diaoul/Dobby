@@ -1,6 +1,7 @@
 [General]
 welcome_message = string(default='I am ready to serve you, master.')
 failed_message = string(default='I did not understand.')
+confirmation_messages = string_list(default=list('Yes?', 'Yes, master?', 'What can I do for you?'))
 recognition_timeout = integer(0, 60, default=5)
 
 [Logging]

@@ -20,8 +20,9 @@ from recognizers.julius import Julius as JuliusRecognizer
 from triggers.clapper import Pattern, QuietPattern, NoisyPattern, Clapper
 from triggers.julius import Julius as JuliusTrigger
 from tts import TTS
-import logging
+import logging.handlers
 import pyjulius
+import sys
 
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,23 @@ def initTTS(action_queue, config):
     return tts
 
 def initController(event_queue, action_queue, recognizer, config):
-    controller = Controller(event_queue, action_queue, Session(), recognizer, config['failed_message'], config['recognition_timeout'])
+    controller = Controller(event_queue, action_queue, Session(), recognizer, config['recognition_timeout'], config['failed_message'], config['confirmation_messages'])
     controller.start()
     return controller
+
+def initLogging(quiet, verbose, config):
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    handlers = []
+    if config['file']:
+        handlers.append(logging.handlers.RotatingFileHandler(config['file'], config['max_bytes'], config['backup_count'], encoding='utf-8'))
+    if not quiet:
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setFormatter(logging.Formatter('%(name)s : %(levelname)-8s : %(message)s'))
+        if verbose:
+            stream_handler.setLevel(logging.DEBUG)
+        else:
+            stream_handler.setLevel(logging.INFO)
+        handlers.append(stream_handler)
+    root.handlers = handlers
     

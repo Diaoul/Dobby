@@ -22,10 +22,10 @@ from models.actions.weather import Weather
 from models.actions.datetime import Datetime
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
-import logger
+import logging
 
 
-logger = logger.getLogger(__name__)
+logger = logging.getLogger(__name__)
 engine = create_engine('sqlite:///dobby.db')
 Session = sessionmaker(bind=engine)
 

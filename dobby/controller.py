@@ -19,6 +19,7 @@ from models.sentence import Sentence
 from triggers import ActionEvent, RecognitionEvent
 import Queue
 import logging
+import random
 import threading
 
 
@@ -26,14 +27,15 @@ logger = logging.getLogger(__name__)
 
 
 class Controller(threading.Thread):
-    def __init__(self, event_queue, action_queue, session, recognizer, failed_message, recognition_timeout):
+    def __init__(self, event_queue, action_queue, session, recognizer, recognition_timeout, failed_message, confirmation_messages):
         super(Controller, self).__init__()
         self.event_queue = event_queue
         self.action_queue = action_queue
         self.session = session
         self.recognizer = recognizer
-        self.failed_action = Action(tts=failed_message)
         self.recognition_timeout = recognition_timeout
+        self.failed_action = Action(tts=failed_message)
+        self.confirmation_messages = confirmation_messages
         self._stop = False
 
     def stop(self):
@@ -51,6 +53,10 @@ class Controller(threading.Thread):
 
             # Launch recognition and analyze the first sentence
             elif isinstance(event, RecognitionEvent):
+                # Send a random confirmation message
+                if self.confirmation_messages:
+                    self.action_queue.put(random.sample(self.confirmation_messages, 1)[0])
+                # Monitor the recognized sentences and catch the first one
                 recognition_queue = Queue.Queue()
                 self.recognizer.subscribe(recognition_queue)
                 try:
@@ -59,6 +65,7 @@ class Controller(threading.Thread):
                     logger.debug(u'RecognitionEvent catched with sentence "%s"' % recognized_sentence)
                     sentence = self.session.query(Sentence).filter(Sentence.text == recognized_sentence).first()
                 except Queue.Empty:
+                    sentence = None
                     pass
                 self.recognizer.unsubscribe(recognition_queue)
 
@@ -66,12 +73,12 @@ class Controller(threading.Thread):
             if not sentence:
                 logger.debug(u'Could not find the sentence in database')
                 if self.failed_action.tts:
-                    self.action_queue.put(self.failed_action.formated_tts)
+                    self.action_queue.put(self.failed_action.format_tts())
                 continue
 
             # Loop over the sentence's actions in the correct order and execute them
             for action_number in sorted(sentence.actions.keys()):
-                self.action_queue.put(sentence.actions[action_number].formated_tts)
+                self.action_queue.put(sentence.actions[action_number].format_tts())
 
             # Mark the task as done
             self.event_queue.task_done()

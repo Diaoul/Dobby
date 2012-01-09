@@ -21,11 +21,12 @@ from sqlalchemy.types import Integer
 
 
 class Datetime(Action):
+    """Datetime Action uses current time
+    
+    :meth:`~dobby.models.actions.Action.format_tts` uses :func:`time.strftime` to format :attr:`~dobby.models.actions.Action.tts`"""
     __tablename__ = 'datetime_actions'
     __mapper_args__ = {'polymorphic_identity': 'datetime'}
     id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
 
-    @property
-    def formated_tts(self):
-        """Format the tts string with the current time"""
+    def format_tts(self):
         return time.strftime(self.tts)
