@@ -27,6 +27,18 @@ logger = logging.getLogger(__name__)
 
 
 class Controller(threading.Thread):
+    """Threaded controller that holds the main logic of Dobby. It grabs events as they come and put corresponding
+    (according to the database) processed actions in the queue.
+    Error message and confirmation messages are customizable
+
+    :param Queue.Queue event_queue: where to listen for events
+    :param Queue.Queue action_queue: where to put the tts from processed actions
+    :param Session session: Dobby database session
+    :param integer recognition_timeout: time to wait for a sentence to be recognized once a :class:`RecognitionEvent` is received
+    :param string failed_message: error message to say when the recognized sentence does not match anything in the database
+    :param list confirmation_messages: a random message to say is picked and sent to the action queue whenever a :class:`RecognitionEvent` is caught
+
+    """
     def __init__(self, event_queue, action_queue, session, recognizer, recognition_timeout, failed_message, confirmation_messages):
         super(Controller, self).__init__()
         self.event_queue = event_queue
@@ -39,6 +51,7 @@ class Controller(threading.Thread):
         self._stop = False
 
     def stop(self):
+        """Stop the thread"""
         self._stop = True
 
     def run(self):

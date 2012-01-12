@@ -18,7 +18,7 @@ import threading
 
 
 class Trigger(threading.Thread):
-    """Threaded Trigger base class. A trigger will :meth:`raise <raise_event>` a :class:`RecognitionEvent` or an :class:`ActionEvent`
+    """Threaded Trigger base class. A trigger will :meth:`raise <raise_event>` a :class:`~dobby.triggers.RecognitionEvent` or an :class:`~dobby.triggers.ActionEvent`
     when the detection is successful
 
     :param Queue.Queue event_queue: queue where to put the events
@@ -34,6 +34,7 @@ class Trigger(threading.Thread):
         self._stop = True
 
     def raise_event(self, event):
+        """Raise an event in the :attr:`event_queue`"""
         self.queue.put(event)
 
 

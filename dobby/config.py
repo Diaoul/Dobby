@@ -20,6 +20,14 @@ import sys
 
 
 def initConfig(path='config.ini'):
+    """Initialize and validate the configuration file. If the validation test fails,
+    error messages are written to sys.stderr and None is returned
+
+    :param string path: path to the configuration file
+    :returns: the read configuration or None if validation fails
+    :rtype: ConfigObj or None
+
+    """
     config = ConfigObj(path, configspec='config.spec', encoding='utf-8')
     vtor = Validator({'option_list': is_option_list})
     results = config.validate(vtor, copy=True)
@@ -33,6 +41,7 @@ def initConfig(path='config.ini'):
     return config
 
 def is_option_list(value, *args):
+    """Validator for a list of options"""
     if not isinstance(value, list):
         raise VdtTypeError(value)
     for v in value:

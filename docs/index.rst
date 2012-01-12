@@ -16,3 +16,4 @@ Contents:
     dobby/models
     dobby/controller
     dobby/app
+    dobby/speakers

@@ -48,11 +48,15 @@ class NoisyBlock(Block):
 
 
 class Sequence(deque):
-    """The latest sequence of blocks read from an audio source
-    Adding a class:`Block` of the same type of the previous one will increase its length
+    """The Sequence is a deque of :class:`Blocks <Block>` with a specific :meth:`append`
 
     """
     def append(self, x):
+        """Append an element or increase length of the previous one if they are of the same type
+
+        :param Block x: Block to append
+
+        """
         if len(self) == 0:
             super(Sequence, self).append(x)
             return
@@ -66,7 +70,13 @@ class Sequence(deque):
 
 
 class PatternItem(object):
-    """A PatternItem is linked to a class:`Block` add will be used to validate it"""
+    """A PatternItem is linked to a :class:`Block` add will be used to validate it
+
+    .. attribute:: validate
+
+        The class to validate
+
+    """
     validate = None
 
     def __init__(self, min_count=None, max_count=None):
@@ -94,7 +104,7 @@ class NoisyPattern(PatternItem):
 
 
 class Pattern(list):
-    """Enhanced list that is used to match a class:`Sequence`"""
+    """Enhanced list that is used to match a :class:`Sequence`"""
     def match(self, sequence):
         if len(sequence) != len(self):
             return False
@@ -106,7 +116,7 @@ class Pattern(list):
 
 class Clapper(Trigger):
     """Analyze an audio source and put a :class:`~dobby.models.recognizers.RecognitionEvent` in the queue
-    if the resulting class:`Sequence` of class:`Block` matches the class:`Pattern`
+    if the resulting :class:`Sequence` of :class:`Block` matches the :class:`Pattern`
 
     :param integer device_index: device index as given per :class:`pyaudio.PyAudio`
     :param Pattern pattern: pattern that has to be matched to :meth:`~dobby.models.recognizers.Recognizer.raise_event` the event
@@ -145,9 +155,8 @@ class Clapper(Trigger):
             # Trigger an event and reset if the sequence matches the pattern
             if self.pattern.match(sequence):
                 logger.debug(u'Pattern matched the sequence %r' % sequence)
-                self.event_queue.put(RecognitionEvent())
+                self.raise_event(RecognitionEvent())
                 sequence.clear()
-            self.event_queue.join()
         # Close
         stream.close()
         pa.terminate()

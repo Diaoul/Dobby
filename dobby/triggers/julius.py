@@ -23,7 +23,13 @@ logger = logging.getLogger(__name__)
 
 
 class Julius(Trigger):
-    """Analyze an audio source and put an event in the queue if sentence is spoken"""
+    """Analyze an audio source and put an event in the queue if sentence is spoken
+
+    :param string sentence: sentence to match
+    :param Recognizer recognizer: :class:`Julius Recognizer <dobby.recognizers.julius.Julius>` instance 
+    :param boolean action: whether to fire :class:`ActionEvents <dobby.triggers.ActionEvent>` or not
+
+    """
     def __init__(self, event_queue, sentence, recognizer, action):
         super(Julius, self).__init__(event_queue)
         self.sentence = sentence

@@ -23,6 +23,7 @@ class Recognizer(threading.Thread):
     hence, receive recognized :class:`pyjulius.Sentence` objects
 
     .. attribute:: subscribers
+
         List of subscribers
 
     """
@@ -46,7 +47,7 @@ class Recognizer(threading.Thread):
 
     def unsubscribe(self, subscriber):
         """Remove a queue from the subscribers list
-        
+
         :param Queue.Queue subscriber: subscriber to remove
 
         """
@@ -56,6 +57,10 @@ class Recognizer(threading.Thread):
         """Publish a recognized sentence to all subscribers
 
         :param pyjulius.Sentence sentence: the recognized sentence
+        
+        .. note::
+        
+            The type of the `sentence` parameter may change in the near future when a new :class:`Recognizer` will be added
 
         """
         for subscriber in self.subscribers:

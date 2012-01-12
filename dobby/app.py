@@ -29,6 +29,15 @@ logger = logging.getLogger(__name__)
 
 
 def initTriggers(event_queue, recognizer, config):
+    """Initialize all triggers as defined in the config
+
+    :param Queue.Queue event_queue: where event will be raised into
+    :param Recognizer recognizer: recognizer instance (only :class:`~dobby.recognizers.julius.Julius` is supported now)
+    :param dict config: triggers-related settings
+    :returns: started triggers
+    :rtype: list of Trigger
+
+    """
     logger.debug(u'Initializing triggers')
     triggers = []
     for trigger_name in config['triggers']:
@@ -47,6 +56,13 @@ def initTriggers(event_queue, recognizer, config):
     return triggers
 
 def initRecognizer(config):
+    """Initialize the recognizer as defined in the config
+
+    :param dict config: recognizer-related settings
+    :returns: started recognizer
+    :rtype: Recognizer
+
+    """
     if config['recognizer'] == 'julius':
         client = pyjulius.Client(config['Julius']['host'], config['Julius']['port'], config['Julius']['encoding'])
         recognizer = JuliusRecognizer(client, config['Julius']['min_score'])
@@ -54,17 +70,42 @@ def initRecognizer(config):
     return recognizer
 
 def initTTS(action_queue, config):
+    """Initialize the TTS as defined in the config
+
+    :param Queue.Queue action_queue: where actions are taken from
+    :param dict config: TTS-related settings
+    :returns: started TTS
+    :rtype: TTS
+
+    """
     tts = TTS('Dobby', action_queue, str(config['engine']), str(config['voice']), str(config['language']),
               config['volume'], config['rate'], config['pitch'])
     tts.start()
     return tts
 
 def initController(event_queue, action_queue, recognizer, config):
+    """Initialize the Controller as defined in the config
+
+    :param Queue.Queue event_queue: where events are taken from
+    :param Queue.Queue action_queue: where actions are put into
+    :param Recognizer recognizer: the recognizer instance
+    :param dict config: general settings
+    :returns: controller
+    :rtype: Controller
+
+    """
     controller = Controller(event_queue, action_queue, Session(), recognizer, config['recognition_timeout'], config['failed_message'], config['confirmation_messages'])
     controller.start()
     return controller
 
 def initLogging(quiet, verbose, config):
+    """Initialize logging
+
+    :param boolean quiet: whether to log in console or not
+    :param boolean verbose: use DEBUG level for console logging
+    :param dict config: logging-related settings
+
+    """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     handlers = []
