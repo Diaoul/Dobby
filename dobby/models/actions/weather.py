@@ -60,6 +60,6 @@ class Weather(Action):
 
     def format_tts(self):
         if not self.data:
+            logger.debug(u'Fetching data from wunderground...')
             self.data = pywunderground.request(API_KEY, ['conditions', 'forecast'], self.query)
-            logger.debug(u'Retreived data: %r' % self.data)
         return self.tts.format(**self.data)
