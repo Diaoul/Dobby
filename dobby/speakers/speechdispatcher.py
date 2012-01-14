@@ -46,6 +46,7 @@ class SpeechDispatcher(Speaker):
         self.client.set_punctuation(speechd.PunctuationMode.SOME)
 
     def speak(self, text):
+        logger.debug(u'Speaking "%s"' % text)
         self.client.speak(text, callback=self._callback, event_types=(speechd.CallbackType.END))
         self.state = SPEAKING
         self._wait()
