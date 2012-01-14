@@ -9,7 +9,7 @@ recognition_timeout = integer(0, 60, default=5)
 speaker = option('speechdispatcher', default='speechdispatcher')
 
 [[SpeechDispatcher]]
-engine = option('espeak', 'flite', default='espeak')
+engine = option('espeak', 'flite', 'espeak-mbrola-generic', default='espeak-mbrola-generic')
 voice = option('MALE1', 'MALE2', 'MALE3', 'FEMALE1', 'FEMALE2', 'FEMALE3', 'CHILD_MALE', 'CHILD_FEMALE', default='MALE1')
 language = option('en', 'fr', default='en')
 volume = integer(-100, 100, default=100)
