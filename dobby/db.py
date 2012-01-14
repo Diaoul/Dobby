@@ -26,10 +26,11 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-engine = create_engine('sqlite:///dobby.db')
-Session = sessionmaker(bind=engine)
+Session = sessionmaker()
 
 
-def initDb():
+def initDb(path):
     logger.info(u'Initializing database')
+    engine = create_engine('sqlite:///' + path)
+    Session.configure(bind=engine)
     Base.metadata.create_all(engine)

@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from . import Speaker, SPEAKING, IDLE
+import logging
 import speechd
 import time
+
+
+logger = logging.getLogger(__name__)
 
 
 class SpeechDispatcher(Speaker):
@@ -68,4 +72,5 @@ class SpeechDispatcher(Speaker):
             i += 1
 
     def terminate(self):
+        logger.debug(u'Terminating...')
         self.client.close()

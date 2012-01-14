@@ -57,7 +57,10 @@ class Controller(threading.Thread):
     def run(self):
         while not self._stop:
             # Get the event from the queue
-            event = self.event_queue.get()
+            try:
+                event = self.event_queue.get(timeout=1)
+            except Queue.Empty:
+                continue
             
             # Fire an Action directly if the event is an ActionEvent
             if isinstance(event, ActionEvent):
@@ -95,3 +98,4 @@ class Controller(threading.Thread):
 
             # Mark the task as done
             self.event_queue.task_done()
+        logger.info(u'Terminating...')

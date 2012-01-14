@@ -14,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 #: Base class for all models

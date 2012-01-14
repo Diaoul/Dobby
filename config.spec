@@ -1,13 +1,9 @@
 [General]
 welcome_message = string(default='I am ready to serve you, master.')
+bye_message = string(default='Bye')
 failed_message = string(default='I did not understand.')
 confirmation_messages = string_list(default=list('Yes?', 'Yes, master?', 'What can I do for you?'))
 recognition_timeout = integer(0, 60, default=5)
-
-[Logging]
-file = string(default='dobby.log')
-max_bytes = integer(default=2097152)
-backup_count = integer(0, 3, default=3)
 
 [Speaker]
 speaker = option('speechdispatcher', default='speechdispatcher')

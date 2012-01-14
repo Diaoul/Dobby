@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from . import Recognizer
+import Queue
 import logging
 import pyjulius
 
@@ -40,13 +41,22 @@ class Julius(Recognizer):
 
     def run(self):
         """Run the recognition and :meth:`~dobby.recognizers.Recognizer.publish` the recognized :class:`pyjulius.Sentence` objects"""
+        self.client.start()
         while not self._stop:
-            recognition = self.client.recognize()
-            sentence = unicode(recognition)
-            score = abs(recognition.score)
+            try:
+                result = self.client.results.get(timeout=1)
+            except Queue.Empty:
+                continue
+            if not isinstance(result, pyjulius.Sentence):
+                continue
+            sentence = unicode(result)
+            score = abs(result.score)
             if self.min_score and score < self.min_score:
                 logger.debug(u'Rejected sentence "%s" with score %f < %f' % (sentence, score, self.min_score))
                 continue
             logger.debug(u'Firing recognition "%s" with score %f' % (sentence, score))
-            self.publish(recognition)
+            self.publish(result)
+        logger.info(u'Terminating...')
+        self.client.stop()
+        self.client.join()
         self.client.disconnect()

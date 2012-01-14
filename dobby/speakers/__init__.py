@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 import Queue
+import logging
 import threading
 import time
 
@@ -31,8 +32,6 @@ class Speaker(threading.Thread):
     def __init__(self, tts_queue):
         super(Speaker, self).__init__()
         self.state = IDLE
-        #TODO: Rename in tts_queue, that would fit better as no actions are actually
-        #in this queue, only text-to-speech
         self.tts_queue = tts_queue
         self._stop = False
 
@@ -57,7 +56,7 @@ class Speaker(threading.Thread):
         """
         while not self._stop:
             try:
-                action_message = self.tts_queue.get(1)
+                action_message = self.tts_queue.get(timeout=1)
             except Queue.Empty:
                 continue
             self.speak(action_message)

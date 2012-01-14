@@ -40,7 +40,10 @@ class Julius(Trigger):
         recognition_queue = Queue.Queue()
         self.recognizer.subscribe(recognition_queue)
         while not self._stop:
-            recognition = recognition_queue.get()
+            try:
+                recognition = recognition_queue.get(timeout=1)
+            except Queue.Empty:
+                continue
             recognized_sentence = unicode(recognition)
             if recognized_sentence == self.sentence:
                 logger.debug(u'Firing RecognitionEvent')
@@ -53,3 +56,4 @@ class Julius(Trigger):
                 continue
             logger.debug(u'Reject recognition "%s"' % (recognized_sentence))
         self.recognizer.unsubscribe(recognition_queue)
+        logger.info(u'Terminating...')

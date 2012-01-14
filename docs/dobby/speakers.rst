@@ -11,6 +11,6 @@ Base
 
 Speechd
 -------
-.. automodule:: dobby.speakers.speechd
+.. automodule:: dobby.speakers.speechdispatcher
     :members:
     :show-inheritance:

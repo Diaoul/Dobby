@@ -35,4 +35,4 @@ pip-log.txt
 docs/_build
 
 #Dobby
-config.ini
+data
