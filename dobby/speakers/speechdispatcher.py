@@ -14,13 +14,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from . import Speaker, IDLE, SPEAKING
+from . import Speaker, SPEAKING, IDLE
 import speechd
 import time
 
 
-class Speechd(Speaker):
-    """Speaker using speechd
+class SpeechDispatcher(Speaker):
+    """Speaker using speech-dispatcher (speechd)
 
     :param string name: speechd's name of the SSIPClient
     :param string engine: speechd's output module
@@ -30,8 +30,8 @@ class Speechd(Speaker):
     :param integer pitch: speechd's pitch
 
     """
-    def __init__(self, action_queue, name, engine, voice, language, volume, rate, pitch):
-        super(Speechd, self).__init__(action_queue)
+    def __init__(self, tts_queue, name, engine, voice, language, volume, rate, pitch):
+        super(SpeechDispatcher, self).__init__(tts_queue)
         self.client = speechd.SSIPClient(name)
         self.client.set_output_module(engine)
         self.client.set_voice(voice)
@@ -41,18 +41,27 @@ class Speechd(Speaker):
         self.client.set_pitch(pitch)
         self.client.set_punctuation(speechd.PunctuationMode.SOME)
 
-    def speak(self, text, blocking=True):
+    def speak(self, text):
         self.client.speak(text, callback=self._callback, event_types=(speechd.CallbackType.END))
         self.state = SPEAKING
         self._wait()
 
     def _callback(self, event_type):
-        """Callback for speechd end of speech"""
+        """Callback for speechd end of speech
+
+        :param speechd.CallbackType event_type: type of the event raised by speechd
+
+        """
         if event_type == speechd.CallbackType.END:
             self.state = IDLE
 
     def _wait(self, timeout=60, poll=0.1):
-        """Block until :attr:`state` changes back to :data:`IDLE`"""
+        """Block until :attr:`state` changes back to :data:`IDLE`
+
+        :param integer timeout: maximum time to wait
+        :param double poll: polling interval for checking :attr:`state`
+
+        """
         i = 0
         while self.state == SPEAKING and i <= timeout / poll:
             time.sleep(poll)

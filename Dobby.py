@@ -18,7 +18,7 @@
 
 from Queue import Queue
 from dobby import infos
-from dobby.app import initRecognizer, initTriggers, initTTS, initController, initLogging
+from dobby.app import initRecognizer, initTriggers, initSpeaker, initController, initLogging
 from dobby.config import initConfig
 from dobby.db import initDb
 import argparse
@@ -56,16 +56,16 @@ def main():
     event_queue = Queue()
     triggers = initTriggers(event_queue, recognizer, config['Trigger'])
 
-    # Init tts
-    action_queue = Queue()
-    tts = initTTS(action_queue, config['TTS'])
+    # Init speaker
+    tts_queue = Queue()
+    speaker = initSpeaker(tts_queue, config['Speaker'])
 
     # Start controller
-    controller = initController(event_queue, action_queue, recognizer, config['General'])
+    controller = initController(event_queue, tts_queue, recognizer, config['General'])
     
     # Welcome message
     if config['General']['welcome_message']:
-        action_queue.put(config['General']['welcome_message'])
+        tts_queue.put(config['General']['welcome_message'])
     
     config.write()
 

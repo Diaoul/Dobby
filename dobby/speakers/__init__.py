@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 import Queue
-import speechd
 import threading
 import time
 
@@ -24,11 +23,17 @@ IDLE, SPEAKING = range(2)
 
 
 class Speaker(threading.Thread):
-    """Threaded Speaker base. Its task is to speak each actions it gets in a row"""
-    def __init__(self, action_queue):
+    """Threaded Speaker base. Its task is to speak each actions it gets in a row
+
+    :param Queue.Queue tts_queue: where to pick text-to-speech
+
+    """
+    def __init__(self, tts_queue):
         super(Speaker, self).__init__()
         self.state = IDLE
-        self.action_queue = action_queue
+        #TODO: Rename in tts_queue, that would fit better as no actions are actually
+        #in this queue, only text-to-speech
+        self.tts_queue = tts_queue
         self._stop = False
 
     def stop(self):
@@ -41,22 +46,20 @@ class Speaker(threading.Thread):
         :param string text: text to speech
 
         """
-        pass
-
-    def wait(self, timeout=10, poll=0.1):
-        
-        pass
 
     def terminate(self):
-        pass
+        """Terminate the thread"""
 
     def run(self):
+        """Wait for events in the :attr:`tts_queue` and speak the received TTS. Once
+        the thread is told to stop, :meth:`terminate` is called
+
+        """
         while not self._stop:
             try:
-                action_message = self.action_queue.get(1)
+                action_message = self.tts_queue.get(1)
             except Queue.Empty:
                 continue
             self.speak(action_message)
-            self.wait(60, 1)
-            self.action_queue.task_done()
+            self.tts_queue.task_done()
         self.terminate()

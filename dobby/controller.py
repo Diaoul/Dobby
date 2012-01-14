@@ -32,17 +32,17 @@ class Controller(threading.Thread):
     Error message and confirmation messages are customizable
 
     :param Queue.Queue event_queue: where to listen for events
-    :param Queue.Queue action_queue: where to put the tts from processed actions
+    :param Queue.Queue tts_queue: where to put the tts from processed actions
     :param Session session: Dobby database session
     :param integer recognition_timeout: time to wait for a sentence to be recognized once a :class:`RecognitionEvent` is received
     :param string failed_message: error message to say when the recognized sentence does not match anything in the database
     :param list confirmation_messages: a random message to say is picked and sent to the action queue whenever a :class:`RecognitionEvent` is caught
 
     """
-    def __init__(self, event_queue, action_queue, session, recognizer, recognition_timeout, failed_message, confirmation_messages):
+    def __init__(self, event_queue, tts_queue, session, recognizer, recognition_timeout, failed_message, confirmation_messages):
         super(Controller, self).__init__()
         self.event_queue = event_queue
-        self.action_queue = action_queue
+        self.tts_queue = tts_queue
         self.session = session
         self.recognizer = recognizer
         self.recognition_timeout = recognition_timeout
@@ -68,7 +68,7 @@ class Controller(threading.Thread):
             elif isinstance(event, RecognitionEvent):
                 # Send a random confirmation message
                 if self.confirmation_messages:
-                    self.action_queue.put(random.sample(self.confirmation_messages, 1)[0])
+                    self.tts_queue.put(random.sample(self.confirmation_messages, 1)[0])
                 # Monitor the recognized sentences and catch the first one
                 recognition_queue = Queue.Queue()
                 self.recognizer.subscribe(recognition_queue)
@@ -86,12 +86,12 @@ class Controller(threading.Thread):
             if not sentence:
                 logger.debug(u'Could not find the sentence in database')
                 if self.failed_action.tts:
-                    self.action_queue.put(self.failed_action.format_tts())
+                    self.tts_queue.put(self.failed_action.format_tts())
                 continue
 
             # Loop over the sentence's actions in the correct order and execute them
             for action_number in sorted(sentence.actions.keys()):
-                self.action_queue.put(sentence.actions[action_number].format_tts())
+                self.tts_queue.put(sentence.actions[action_number].format_tts())
 
             # Mark the task as done
             self.event_queue.task_done()

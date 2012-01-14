@@ -24,7 +24,7 @@ def initConfig(path='config.ini'):
     error messages are written to sys.stderr and None is returned
 
     :param string path: path to the configuration file
-    :returns: the read configuration or None if validation fails
+    :return: the read configuration or None if validation fails
     :rtype: ConfigObj or None
 
     """

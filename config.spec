@@ -9,10 +9,10 @@ file = string(default='dobby.log')
 max_bytes = integer(default=2097152)
 backup_count = integer(0, 3, default=3)
 
-[Speakers]
-speaker = option('speechd', default='speechd')
+[Speaker]
+speaker = option('speechdispatcher', default='speechdispatcher')
 
-[[Speechd]]
+[[SpeechDispatcher]]
 engine = option('espeak', 'flite', default='espeak')
 voice = option('MALE1', 'MALE2', 'MALE3', 'FEMALE1', 'FEMALE2', 'FEMALE3', 'CHILD_MALE', 'CHILD_FEMALE', default='MALE1')
 language = option('en', 'fr', default='en')
