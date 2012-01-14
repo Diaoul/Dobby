@@ -20,6 +20,7 @@ from models.association import Association
 from models.actions import Action
 from models.actions.weather import Weather
 from models.actions.datetime import Datetime
+from models.actions.feed import Feed
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
 import logging
