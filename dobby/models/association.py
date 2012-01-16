@@ -21,14 +21,14 @@ from sqlalchemy.types import Integer
 
 
 class Association(Base):
-    """Association model that represents an association between a :class:`~dobby.models.sentence.Sentence`
+    """Association model that represents an association between a :class:`~dobby.models.scenario.Scenario`
     and a :class:`~dobby.models.actions.Action` with a special :attr:`order`
 
     :param \*\*kwargs: can set all attributes
 
-    .. attribute:: sentence_id
+    .. attribute:: scenario_id
 
-        Foreing key to :attr:`Sentence.id <dobby.models.sentence.Sentence.id>`
+        Foreing key to :attr:`Scenario.id <dobby.models.scenario.Scenario.id>`
 
     .. attribute:: action_id
 
@@ -36,11 +36,11 @@ class Association(Base):
 
     .. attribute:: order
 
-        Order in which the :class:`~dobby.models.actions.Action` objects of a :class:`~dobby.models.sentence.Sentence` should be executed
+        Order in which the :class:`~dobby.models.actions.Action` objects of a :class:`~dobby.models.scenario.Scenario` should be executed
 
-    .. attribute:: sentence
+    .. attribute:: scenario
 
-        Direct access to the :class:`~dobby.models.sentence.Sentence` object
+        Direct access to the :class:`~dobby.models.scenario.Scenario` object
 
     .. attribute:: action
 
@@ -48,12 +48,12 @@ class Association(Base):
 
     """
     __tablename__ = 'associations'
-    sentence_id = Column(Integer, ForeignKey('sentences.id'), primary_key=True)
+    scenario_id = Column(Integer, ForeignKey('scenarios.id'), primary_key=True)
     action_id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
     order = Column(Integer)
 
-    sentence = relationship('Sentence', back_populates='associations')
+    scenario = relationship('Scenario', back_populates='associations')
     action = relationship('Action', back_populates='associations')
 
     def __repr__(self):
-        return '<Association("%d")>' % (self.order or 0)
+        return "<Association('%r', '%r', '%d')>" % (self.scenario, self.action, self.order or 0)

@@ -14,9 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
+from dobby.models.voice_command import VoiceCommand
 from models.actions import Action
-from models.sentence import Sentence
-from triggers import ActionEvent, RecognitionEvent
+from models.scenario import Scenario
+from triggers import VoiceCommandEvent, RecognitionEvent
 import Queue
 import logging
 import random
@@ -34,8 +35,8 @@ class Controller(threading.Thread):
     :param Queue.Queue event_queue: where to listen for events
     :param Queue.Queue tts_queue: where to put the tts from processed actions
     :param Session session: Dobby database session
-    :param integer recognition_timeout: time to wait for a sentence to be recognized once a :class:`RecognitionEvent` is received
-    :param string failed_message: error message to say when the recognized sentence does not match anything in the database
+    :param integer recognition_timeout: time to wait for a :class:`~dobby.models.voice_command.VoiceCommand` to be recognized once a :class:`RecognitionEvent` is received
+    :param string failed_message: error message to say when the recognized :class:`~dobby.models.voice_command.VoiceCommand` does not match anything in the database
     :param list confirmation_messages: a random message to say is picked and sent to the action queue whenever a :class:`RecognitionEvent` is caught
 
     """
@@ -62,39 +63,39 @@ class Controller(threading.Thread):
             except Queue.Empty:
                 continue
             
-            # Fire an Action directly if the event is an ActionEvent
-            if isinstance(event, ActionEvent):
-                logger.debug(u'ActionEvent catched with sentence "%s"' % event.sentence)
-                sentence = self.session.query(Sentence).filter(Sentence.text == event.sentence).first()
+            # Fire a Scenario directly if the event is an VoiceCommandEvent
+            if isinstance(event, VoiceCommandEvent):
+                logger.debug(u'VoiceCommandEvent caught with command "%s"' % event.voice_command)
+                scenario = self.session.query(Scenario).join(VoiceCommand).filter(VoiceCommand.text == event.voice_command).first()
 
-            # Launch recognition and analyze the first sentence
+            # Launch recognition and analyze the first voice command
             elif isinstance(event, RecognitionEvent):
                 # Send a random confirmation message
                 if self.confirmation_messages:
                     self.tts_queue.put(random.sample(self.confirmation_messages, 1)[0])
-                # Monitor the recognized sentences and catch the first one
+                # Monitor the recognized voice commands and catch the first one
                 recognition_queue = Queue.Queue()
                 self.recognizer.subscribe(recognition_queue)
                 try:
                     recognition = recognition_queue.get(timeout=self.recognition_timeout)
-                    recognized_sentence = unicode(recognition)
-                    logger.debug(u'RecognitionEvent catched with sentence "%s"' % recognized_sentence)
-                    sentence = self.session.query(Sentence).filter(Sentence.text == recognized_sentence).first()
+                    recognized_voice_command = unicode(recognition)
+                    logger.debug(u'RecognitionEvent caught with voice command "%s"' % recognized_voice_command)
+                    scenario = self.session.query(Scenario).join(VoiceCommand).filter(VoiceCommand.text == recognized_voice_command).first()
                 except Queue.Empty:
-                    sentence = None
+                    scenario = None
                     pass
                 self.recognizer.unsubscribe(recognition_queue)
 
-            # Failed message if no sentence
-            if not sentence:
-                logger.debug(u'Could not find the sentence in database')
+            # Failed message if no scenario
+            if not scenario:
+                logger.debug(u'Could not find the scenario in database')
                 if self.failed_action.tts:
                     self.tts_queue.put(self.failed_action.format_tts())
                 continue
 
-            # Loop over the sentence's actions in the correct order and execute them
-            for action_number in sorted(sentence.actions.keys()):
-                self.tts_queue.put(sentence.actions[action_number].format_tts())
+            # Loop over the scenario's actions in the correct order and execute them
+            for action_number in sorted(scenario.actions.keys()):
+                self.tts_queue.put(scenario.actions[action_number].format_tts())
 
             # Mark the task as done
             self.event_queue.task_done()

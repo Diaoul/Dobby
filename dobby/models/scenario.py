@@ -15,46 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from . import Base
-from association import Association
+from dobby.models.association import Association
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer, UnicodeText
+from sqlalchemy.types import Integer, Unicode
 
 
-class Sentence(Base):
-    """Sentence model that represents a sentence to be detected by a :class:`~dobby.recognizers.Recognizer`
-
-    :param \*\*kwargs: can set all attributes
-
-    .. attribute:: id
-
-        Sentence id
-
-    .. attribute:: text
-
-        Text to be detected
-
-    .. attribute:: associations
-
-        Relationship to all related :class:`~dobby.models.association.Association` objects
-
-    .. attribute:: actions
-
-        Relationship to all related :class:`~dobby.models.actions.Action` objects in the right :attr:`~dobby.models.association.Association.order`
+class Scenario(Base):
+    """A Scenario is an ordered list of :class:`Actions <dobby.models.actions.Action>` to be executed when
+    a specific voice command is recognized
 
     """
-    __tablename__ = 'sentences'
+    __tablename__ = 'scenarios'
     id = Column(Integer, primary_key=True)
-    text = Column(UnicodeText)
+    name = Column(Unicode(50))
 
-    associations = relationship('Association', back_populates='sentence', order_by='Association.order',
+    voice_commands = relationship('VoiceCommand', back_populates='scenario')
+    associations = relationship('Association', back_populates='scenario', order_by='Association.order',
                                 collection_class=attribute_mapped_collection('order'))
     actions = association_proxy('associations', 'action', creator=lambda k, v: Association(order=k, action=v))
 
-    def __init__(self, text):
-        self.text = text
-
     def __repr__(self):
-        return '<Sentence("%s")>' % self.text
+        return "<Scenario('%s')>" % self.name

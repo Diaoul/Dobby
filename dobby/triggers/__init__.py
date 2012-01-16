@@ -19,7 +19,7 @@ import threading
 
 
 class Trigger(threading.Thread):
-    """Threaded Trigger base class. A trigger will :meth:`raise <raise_event>` a :class:`~dobby.triggers.RecognitionEvent` or an :class:`~dobby.triggers.ActionEvent`
+    """Threaded Trigger base class. A trigger will :meth:`raise <raise_event>` a :class:`~dobby.triggers.RecognitionEvent` or an :class:`~dobby.triggers.VoiceCommandEvent`
     when the detection is successful
 
     :param Queue.Queue event_queue: queue where to put the events
@@ -41,17 +41,17 @@ class Trigger(threading.Thread):
 
 class RecognitionEvent(object):
     """A RecognitionEvent indicates that the recognition can be launched to
-    analyze the next sentence
+    analyze the next voice command
 
     """
 
 
-class ActionEvent(object):
-    """An ActionEvent indicates that this is not necessary to launch the recognition
-    and provides the recognized sentence
+class VoiceCommandEvent(object):
+    """An VoiceCommandEvent indicates that this is not necessary to launch the recognition
+    and provides the recognized voice command
 
-    :param string sentence: the recognized sentence
+    :param string voice_command: the recognized voice command
 
     """
-    def __init__(self, sentence):
-        self.sentence = sentence
+    def __init__(self, voice_command):
+        self.voice_command = voice_command

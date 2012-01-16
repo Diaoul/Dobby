@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from . import Trigger, RecognitionEvent, ActionEvent
+from . import Trigger, RecognitionEvent, VoiceCommandEvent
 import Queue
 import logging
 
@@ -23,16 +23,16 @@ logger = logging.getLogger(__name__)
 
 
 class Julius(Trigger):
-    """Analyze an audio source and put an event in the queue if sentence is spoken
+    """Analyze an audio source and put an event in the queue if voice command is spoken
 
-    :param string sentence: sentence to match
+    :param string voice_command: voice command to match
     :param Recognizer recognizer: :class:`Julius Recognizer <dobby.recognizers.julius.Julius>` instance 
-    :param boolean action: whether to fire :class:`ActionEvents <dobby.triggers.ActionEvent>` or not
+    :param boolean action: whether to fire :class:`VoiceCommandEvents <dobby.triggers.VoiceCommandEvent>` or not
 
     """
-    def __init__(self, event_queue, sentence, recognizer, action):
+    def __init__(self, event_queue, voice_command, recognizer, action):
         super(Julius, self).__init__(event_queue)
-        self.sentence = sentence
+        self.voice_command = voice_command
         self.recognizer = recognizer
         self.action = action
 
@@ -44,16 +44,16 @@ class Julius(Trigger):
                 recognition = recognition_queue.get(timeout=1)
             except Queue.Empty:
                 continue
-            recognized_sentence = unicode(recognition)
-            if recognized_sentence == self.sentence:
+            recognized_voice_command = unicode(recognition)
+            if recognized_voice_command == self.voice_command:
                 logger.debug(u'Firing RecognitionEvent')
                 self.event_queue.put(RecognitionEvent())
                 continue
-            if self.action and recognized_sentence.startswith(self.sentence):
-                action_sentence = recognized_sentence[len(self.sentence) + 1:]
-                logger.debug(u'Firing ActionEvent("%s")' % action_sentence)
-                self.event_queue.put(ActionEvent(action_sentence))
+            if self.action and recognized_voice_command.startswith(self.voice_command):
+                voice_command = recognized_voice_command[len(self.voice_command) + 1:]
+                logger.debug(u'Firing VoiceCommandEvent("%s")' % voice_command)
+                self.event_queue.put(VoiceCommandEvent(voice_command))
                 continue
-            logger.debug(u'Reject recognition "%s"' % (recognized_sentence))
+            logger.debug(u'Reject recognition "%s"' % (recognized_voice_command))
         self.recognizer.unsubscribe(recognition_queue)
         logger.info(u'Terminating...')

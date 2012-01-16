@@ -14,25 +14,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from models import Base
-from models.voice_command import VoiceCommand
-from models.scenario import Scenario
-from models.association import Association
-from models.actions import Action
-from models.actions.weather import Weather
-from models.actions.datetime import Datetime
-from models.actions.feed import Feed
-from sqlalchemy.engine import create_engine
-from sqlalchemy.orm.session import sessionmaker
-import logging
+from . import Base
+from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.types import Integer, Unicode
 
 
-logger = logging.getLogger(__name__)
-Session = sessionmaker()
+class VoiceCommand(Base):
+    """A VoiceCommand is a text to be recognized by a Recognizer. It is attached to a Scenario and will trigger it
+    """
+    __tablename__ = 'voice_commands'
+    id = Column(Integer, primary_key=True)
+    scenario_id = Column(Integer, ForeignKey('scenarios.id'))
+    text = Column(Unicode(200))
 
+    scenario = relationship('Scenario', back_populates='voice_commands')
 
-def initDb(path):
-    logger.info(u'Initializing database')
-    engine = create_engine('sqlite:///' + path)
-    Session.configure(bind=engine)
-    Base.metadata.create_all(engine)
+    def __repr__(self):
+        return "<VoiceCommand('%s')>" % self.text
