@@ -38,7 +38,7 @@ appdir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Application(object):
-    def __init__(self, datadir, configfile=None, pidfile=None, quiet=False, verbose=False, daemon=False):
+    def __init__(self, datadir, configfile=None, pidfile=None, quiet=False, verbose=False, daemon=False, use_):
         self.datadir = os.path.abspath(datadir)
         if not os.path.exists(self.datadir):
             os.makedirs(self.datadir)

@@ -36,3 +36,4 @@ docs/_build
 
 #Dobby
 data
+dobby/qt/ui/*ui.py
