@@ -49,6 +49,11 @@ class Application(object):
         self.daemon = daemon
         self.use_signal = use_signal
         self._stop = False
+        self.event_queue = Queue()
+        self.tts_queue = Queue()
+        self.config = initConfig(self.configfile)
+        initLogging(self.quiet or self.daemon, self.verbose, os.path.join(self.datadir, 'logs'))
+        initDb(os.path.join(self.datadir, 'dobby.db'))
 
     def daemonize(self):
         """Do the UNIX double-fork magic, see Stevens' "Advanced
@@ -87,10 +92,7 @@ class Application(object):
     
     def start(self):
         """Start the application (and daemonize if necessary)"""
-        # Write pid
         file(self.pidfile, 'w+').write('%s\n' % str(os.getpid()))
-        
-        # Daemonize if requested
         if self.daemon:
             self.daemonize()
         self.run()
@@ -112,24 +114,13 @@ class Application(object):
         self._stop = True
 
     def run(self):
-        # Init config
-        self.config = initConfig(self.configfile)
-        
-        # Init logging
-        initLogging(self.quiet or self.daemon, self.verbose, os.path.join(self.datadir, 'logs'))
-        
-        # Init db
-        initDb(os.path.join(self.datadir, 'dobby.db'))
-        
         # Init recognizer
         self.recognizer = initRecognizer(self.config['Recognizer'])
     
         # Init triggers
-        self.event_queue = Queue()
         self.triggers = initTriggers(self.event_queue, self.recognizer, self.config['Trigger'])
     
         # Init speaker
-        self.tts_queue = Queue()
         self.speaker = initSpeaker(self.tts_queue, self.config['Speaker'])
     
         # Start controller
@@ -140,8 +131,9 @@ class Application(object):
             self.tts_queue.put(self.config['General']['welcome_message'])
 
         # Plug signals
-        signal.signal(signal.SIGINT, self.signal_handler)
-        signal.signal(signal.SIGTERM, self.signal_handler)
+        if self.use_signal:
+            signal.signal(signal.SIGINT, self.signal_handler)
+            signal.signal(signal.SIGTERM, self.signal_handler)
         
         # Wait until it's time to exit
         while not self._stop:

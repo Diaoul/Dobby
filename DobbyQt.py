@@ -15,13 +15,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from PySide import QtGui
-from dobby.qt.app import Application
+from dobby.qt.app import Application, MainWindow
 import sys
 
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
-    imageViewer = Application()
-    imageViewer.main()
-    app.exec_()
+    app = Application(sys.argv)
+    app.initTranslators()
+    w = MainWindow()
+    w.show()
+    sys.exit(app.exec_())
