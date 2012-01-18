@@ -18,20 +18,16 @@ from ..app import Application as Dobby
 from PySide import QtGui, QtCore
 from ui.mainui import Ui_MainWindow
 import locale
-import logging
 import os.path
 import time
-
-
-logger = logging.getLogger(__name__)
 
 
 class Application(QtGui.QApplication):
     def initTranslators(self):
         loc = locale.getdefaultlocale()[0]
         translator = QtCore.QTranslator()
-        print translator.load(os.path.join('ts', loc))
-        print translator.load('qt_' + loc, QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath))
+        translator.load(os.path.join('ts', loc))
+        translator.load('qt_' + loc, QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath))
         self.installTranslator(translator)
 
 
