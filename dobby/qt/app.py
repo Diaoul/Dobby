@@ -71,6 +71,7 @@ class DobbyApplication(QtCore.QThread):
     def stop(self):
         self.dobby.stop()
         self._stop = True
+        self.wait()
 
     def run(self):
         self.dobby.start()
