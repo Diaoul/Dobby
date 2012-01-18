@@ -38,7 +38,7 @@ appdir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Application(object):
-    def __init__(self, datadir, configfile=None, pidfile=None, quiet=False, verbose=False, daemon=False, use_):
+    def __init__(self, datadir, configfile=None, pidfile=None, quiet=False, verbose=False, daemon=False, use_signal=True):
         self.datadir = os.path.abspath(datadir)
         if not os.path.exists(self.datadir):
             os.makedirs(self.datadir)
@@ -47,6 +47,8 @@ class Application(object):
         self.quiet = quiet
         self.verbose = verbose
         self.daemon = daemon
+        self.use_signal = use_signal
+        self._stop = False
 
     def daemonize(self):
         """Do the UNIX double-fork magic, see Stevens' "Advanced
@@ -61,12 +63,12 @@ class Application(object):
         except OSError, e:
             sys.stderr.write('Fork #1 failed: %d (%s)\n' % (e.errno, e.strerror))
             sys.exit(1)
-        
+
         # decouple from parent environment
         os.chdir('/')
         os.setsid()
         os.umask(0)
-        
+
         # do second fork
         try:
             pid = os.fork()
@@ -75,132 +77,81 @@ class Application(object):
         except OSError, e:
             sys.stderr.write('Fork #2 failed: %d (%s)\n' % (e.errno, e.strerror))
             sys.exit(1)
-        
-        # redirect standard file descriptors
-        sys.stdout.flush()
-        sys.stderr.flush()
-        si = file('/dev/null', 'r')
-        so = file('/dev/null', 'a+')
-        se = file('/dev/null', 'a+', 0)
-        os.dup2(si.fileno(), sys.stdin.fileno())
-        os.dup2(so.fileno(), sys.stdout.fileno())
-        os.dup2(se.fileno(), sys.stderr.fileno())
-        
+
         # write pidfile
         atexit.register(self.delpid)
         file(self.pidfile, 'w+').write('%s\n' % str(os.getpid()))
-    
+
     def delpid(self):
         os.remove(self.pidfile)
     
     def start(self):
-        """Start the application/daemon"""
-        # In case we run the application not as daemon, write pid and run
-        if not self.daemon:
-            file(self.pidfile, 'w+').write('%s\n' % str(os.getpid()))
-            self.run()
-            return
-
-        # Check for a pidfile to see if the daemon already runs
-        try:
-            pf = file(self.pidfile, 'r')
-            pid = int(pf.read().strip())
-            pf.close()
-        except IOError:
-            pid = None
+        """Start the application (and daemonize if necessary)"""
+        # Write pid
+        file(self.pidfile, 'w+').write('%s\n' % str(os.getpid()))
         
-        if pid:
-            sys.stderr.write('pidfile %s already exist. Daemon already running?\n' % self.pidfile)
-            sys.exit(1)
-        
-        # Start the daemon
-        self.daemonize()
+        # Daemonize if requested
+        if self.daemon:
+            self.daemonize()
         self.run()
-    
+
     def stop(self):
-        """Stop the daemon"""
-        # Get the pid from the pidfile
-        try:
-            pf = file(self.pidfile, 'r')
-            pid = int(pf.read().strip())
-            pf.close()
-        except IOError:
-            pid = None
-        
-        if not pid:
-            sys.stderr.write('pidfile %s does not exist. Daemon not running?\n' % self.pidfile)
-            return # not an error in a restart
-        
-        # Try killing the daemon process       
-        try:
-            while 1:
-                os.kill(pid, signal.SIGTERM)
-                time.sleep(0.1)
-        except OSError, err:
-            err = str(err)
-            if err.find('No such process') > 0:
-                if os.path.exists(self.pidfile):
-                    os.remove(self.pidfile)
-            else:
-                print str(err)
-                sys.exit(1)
-    
-    def restart(self):
-        """Restart the daemon"""
-        self.stop()
-        self.start()
+        """Stop the application"""
+        if self.config['General']['bye_message']:
+            self.tts_queue.put(self.config['General']['bye_message'])
+        self.controller.stop()
+        self.controller.join()
+        for trigger in self.triggers:
+            trigger.stop()
+            trigger.join()
+        self.recognizer.stop()
+        self.recognizer.join()
+        self.speaker.stop()
+        self.speaker.join()
+        self.config.write()
+        self._stop = True
 
     def run(self):
         # Init config
-        config = initConfig(self.configfile)
+        self.config = initConfig(self.configfile)
         
         # Init logging
-        initLogging(self.quiet, self.verbose, os.path.join(self.datadir, 'logs'))
+        initLogging(self.quiet or self.daemon, self.verbose, os.path.join(self.datadir, 'logs'))
         
         # Init db
         initDb(os.path.join(self.datadir, 'dobby.db'))
         
         # Init recognizer
-        recognizer = initRecognizer(config['Recognizer'])
+        self.recognizer = initRecognizer(self.config['Recognizer'])
     
         # Init triggers
-        event_queue = Queue()
-        triggers = initTriggers(event_queue, recognizer, config['Trigger'])
+        self.event_queue = Queue()
+        self.triggers = initTriggers(self.event_queue, self.recognizer, self.config['Trigger'])
     
         # Init speaker
-        tts_queue = Queue()
-        speaker = initSpeaker(tts_queue, config['Speaker'])
+        self.tts_queue = Queue()
+        self.speaker = initSpeaker(self.tts_queue, self.config['Speaker'])
     
         # Start controller
-        controller = initController(event_queue, tts_queue, recognizer, config['General'])
+        self.controller = initController(self.event_queue, self.tts_queue, self.recognizer, self.config['General'])
         
         # Welcome message
-        if config['General']['welcome_message']:
-            tts_queue.put(config['General']['welcome_message'])
-
-        # Handle termination
-        def handler(*args):
-            logger.info(u'Stop signal caught')
-            if config['General']['bye_message']:
-                tts_queue.put(config['General']['bye_message'])
-            controller.stop()
-            controller.join()
-            for trigger in triggers:
-                trigger.stop()
-                trigger.join()
-            recognizer.stop()
-            recognizer.join()
-            speaker.stop()
-            speaker.join()
-            config.write()
-            exit(0)
+        if self.config['General']['welcome_message']:
+            self.tts_queue.put(self.config['General']['welcome_message'])
 
         # Plug signals
-        signal.signal(signal.SIGINT, handler)
-        signal.signal(signal.SIGTERM, handler)
+        signal.signal(signal.SIGINT, self.signal_handler)
+        signal.signal(signal.SIGTERM, self.signal_handler)
         
         # Wait until it's time to exit
-        signal.pause()
+        while not self._stop:
+            time.sleep(1)
+
+    def signal_handler(self, *args):
+        logger.info(u'Stop signal caught')
+        self.stop()
+        exit(0)
+        
 
 def initTriggers(event_queue, recognizer, config):
     """Initialize all triggers as defined in the config
