@@ -23,7 +23,8 @@ import time
 
 
 class Application(QtGui.QApplication):
-    def initTranslators(self):
+    def __init__(self, args):
+        super(Application, self).__init__(args)
         loc = locale.getdefaultlocale()[0]
         translator = QtCore.QTranslator()
         translator.load(os.path.join('ts', loc))
@@ -41,9 +42,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def connectActions(self):
         self.actionStart.triggered.connect(self.dobby.start)
         self.actionStop.triggered.connect(self.dobby.stop)
-        self.actionQuit.triggered.connect(self.quit)
+        #self.actionQuit.triggered.connect(self.quit)
 
     def closeEvent(self, event):
+        #TODO: Check for session.dirty and prompt to save changes
         reply = QtGui.QMessageBox.question(self, 'Message', "Are you sure to quit?",
                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No,
                                            QtGui.QMessageBox.No)
@@ -65,6 +67,8 @@ class DobbyApplication(QtCore.QThread):
         self._stop = False
 
     def stop(self):
+        if not self.isRunning():
+            return
         self.dobby.stop()
         self._stop = True
         self.wait()

@@ -99,6 +99,8 @@ class Application(object):
 
     def stop(self):
         """Stop the application"""
+        if self._stop:
+            return
         if self.config['General']['bye_message']:
             self.tts_queue.put(self.config['General']['bye_message'])
         self.controller.stop()
