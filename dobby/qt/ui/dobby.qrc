@@ -1,0 +1,14 @@
+<RCC>
+  <qresource prefix="actions">
+    <file alias="datetime">icons/oxygen/apps/small/16x16/clock.svgz</file>
+    <file alias="weather">icons/oxygen/status/small/32x32/weather-clouds.svgz</file>
+    <file alias="feed">icons/oxygen/mimetypes/small/16x16/application-rss+xml.svgz</file>
+  </qresource>
+  <qresource prefix="controls">
+    <file alias="start">icons/tango/actions/media-playback-start.svg</file>
+    <file alias="stop">icons/tango/actions/media-playback-stop.svg</file>
+    <file alias="configure">icons/tango/categories/preferences-system.svg</file>
+    <file alias="list-add">icons/tango/actions/list-add.svg</file>
+    <file alias="list-remove">icons/tango/actions/list-remove.svg</file>
+  </qresource>
+</RCC>

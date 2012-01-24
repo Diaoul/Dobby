@@ -6,111 +6,407 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>498</height>
+    <width>1018</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dobby</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <widget class="QGroupBox" name="scenariosGroupBox">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>20</y>
-      <width>271</width>
-      <height>391</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Scenarios</string>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QPushButton" name="newScenario">
-       <property name="text">
-        <string>New</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="deleteScenario">
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" colspan="2">
-      <widget class="QListView" name="scenarioListView"/>
-     </item>
-    </layout>
-   </widget>
+  <widget class="QWidget" name="qwCentral">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QGroupBox" name="qbpScenarios">
+      <property name="title">
+       <string>Scenarios</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0" rowspan="4">
+        <layout class="QVBoxLayout" name="qvblScenarios">
+         <item>
+          <widget class="QListView" name="qlvScenarios"/>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="qhblScenarioEdit">
+           <item>
+            <widget class="QLineEdit" name="qleScenario"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="qpbScenarioAdd">
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="dobby.qrc">
+               <normaloff>:/controls/list-add</normaloff>:/controls/list-add</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="qpbScenarioRemove">
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="dobby.qrc">
+               <normaloff>:/controls/list-remove</normaloff>:/controls/list-remove</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="qgbScenarioActions">
+         <property name="title">
+          <string>Actions</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QListView" name="qlvScenarioActions"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="1" rowspan="2">
+        <widget class="QGroupBox" name="qgbScenarioCommands">
+         <property name="title">
+          <string>Commands</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="qvblScenarioCommands">
+            <item>
+             <widget class="QListView" name="qlvScenarioCommands"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="qhblScenarioCommandEdit">
+              <item>
+               <widget class="QLineEdit" name="qleScenarioCommand"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="qpbScenarioCommandAdd">
+                <property name="maximumSize">
+                 <size>
+                  <width>25</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="dobby.qrc">
+                  <normaloff>:/controls/list-add</normaloff>:/controls/list-add</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="qpbScenarioCommandRemove">
+                <property name="maximumSize">
+                 <size>
+                  <width>25</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="dobby.qrc">
+                  <normaloff>:/controls/list-remove</normaloff>:/controls/list-remove</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="qgbActions">
+      <property name="title">
+       <string>Actions</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QListView" name="qlvActions"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="qhblActionEdit">
+         <item>
+          <widget class="QComboBox" name="qcbActionType">
+           <item>
+            <property name="text">
+             <string>Weather</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dobby.qrc">
+              <normaloff>:/actions/weather</normaloff>:/actions/weather</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Datetime</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dobby.qrc">
+              <normaloff>:/actions/datetime</normaloff>:/actions/datetime</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Feed</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dobby.qrc">
+              <normaloff>:/actions/feed</normaloff>:/actions/feed</iconset>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="qpbActionAdd">
+           <property name="maximumSize">
+            <size>
+             <width>25</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="dobby.qrc">
+             <normaloff>:/controls/list-add</normaloff>:/controls/list-add</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="qpbActionRemove">
+           <property name="maximumSize">
+            <size>
+             <width>25</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="dobby.qrc">
+             <normaloff>:/controls/list-remove</normaloff>:/controls/list-remove</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+   <zorder>qgbActions</zorder>
+   <zorder>qbpScenarios</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>379</width>
+     <width>1018</width>
      <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>?</string>
+     <string>&amp;Help</string>
     </property>
-    <addaction name="actionAbout"/>
+    <addaction name="qaAbout"/>
    </widget>
    <widget class="QMenu" name="menuGrammar">
     <property name="title">
-     <string>Grammar</string>
+     <string>&amp;Grammar</string>
     </property>
-    <addaction name="actionGenerate"/>
+    <addaction name="qaGenerate"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;Dobby</string>
     </property>
-    <addaction name="actionStart"/>
-    <addaction name="actionStop"/>
-    <addaction name="actionQuit"/>
+    <addaction name="qaStart"/>
+    <addaction name="qaStop"/>
+    <addaction name="qaConfigure"/>
+    <addaction name="qaQuit"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuGrammar"/>
    <addaction name="menu"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionAbout">
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="qaStart"/>
+   <addaction name="qaStop"/>
+   <addaction name="qaConfigure"/>
+   <addaction name="separator"/>
+  </widget>
+  <action name="qaAbout">
    <property name="text">
-    <string>About...</string>
+    <string>&amp;About...</string>
    </property>
   </action>
-  <action name="actionGenerate">
+  <action name="qaGenerate">
    <property name="text">
-    <string>Generate...</string>
+    <string>&amp;Generate...</string>
    </property>
   </action>
-  <action name="actionQuit">
+  <action name="qaQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
-  <action name="actionStart">
+  <action name="qaStart">
+   <property name="icon">
+    <iconset resource="dobby.qrc">
+     <normaloff>:/controls/start</normaloff>:/controls/start</iconset>
+   </property>
    <property name="text">
-    <string>Start</string>
+    <string>Sta&amp;rt</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D, R</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
-  <action name="actionStop">
+  <action name="qaStop">
+   <property name="icon">
+    <iconset resource="dobby.qrc">
+     <normaloff>:/controls/stop</normaloff>:/controls/stop</iconset>
+   </property>
    <property name="text">
-    <string>Stop</string>
+    <string>&amp;Stop</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D, S</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="qaConfigure">
+   <property name="icon">
+    <iconset resource="dobby.qrc">
+     <normaloff>:/controls/configure</normaloff>:/controls/configure</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Configure</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D, P</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionAdd">
+   <property name="text">
+    <string>Add...</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>qlvScenarios</tabstop>
+  <tabstop>qleScenario</tabstop>
+  <tabstop>qpbScenarioAdd</tabstop>
+  <tabstop>qpbScenarioRemove</tabstop>
+  <tabstop>qlvScenarioActions</tabstop>
+  <tabstop>qlvScenarioCommands</tabstop>
+  <tabstop>qleScenarioCommand</tabstop>
+  <tabstop>qpbScenarioCommandAdd</tabstop>
+  <tabstop>qpbScenarioCommandRemove</tabstop>
+  <tabstop>qlvActions</tabstop>
+  <tabstop>qcbActionType</tabstop>
+  <tabstop>qpbActionAdd</tabstop>
+  <tabstop>qpbActionRemove</tabstop>
+ </tabstops>
+ <resources>
+  <include location="dobby.qrc"/>
+ </resources>
  <connections>
   <connection>
-   <sender>actionQuit</sender>
+   <sender>qaQuit</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>

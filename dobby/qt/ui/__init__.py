@@ -25,11 +25,16 @@ uidir = os.path.abspath(os.path.dirname(__file__))
 
 def generate():
     """Generate PySide UI Python files using a subprocess call"""
-    for py in glob.glob(os.path.join(uidir, '*ui.py')):
+    for py in glob.glob(os.path.join(uidir, '*_ui.py')):
+        os.remove(py)
+    for py in glob.glob(os.path.join(uidir, '*_rc.py')):
         os.remove(py)
     for ui in glob.glob(os.path.join(uidir, '*.ui')):
-        with open(os.path.splitext(ui)[0] + 'ui.py', 'w') as py:
+        with open(os.path.splitext(ui)[0] + '_ui.py', 'w') as py:
             subprocess.call(['pyside-uic', ui], stdout=py)
+    for qrc in glob.glob(os.path.join(uidir, '*.qrc')):
+        with open(os.path.splitext(qrc)[0] + '_rc.py', 'w') as py:
+            subprocess.call(['pyside-rcc', qrc], stdout=py)
 
 if __name__ == '__main__':
     generate()

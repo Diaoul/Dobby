@@ -20,15 +20,14 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Integer, Unicode
 
 
-class VoiceCommand(Base):
-    """A VoiceCommand is a text to be recognized by a Recognizer. It is attached to a Scenario and will trigger it
-    """
-    __tablename__ = 'voice_commands'
+class Command(Base):
+    """A Command is a text to be recognized by a Recognizer. It is attached to a Scenario and will trigger it"""
+    __tablename__ = 'commands'
     id = Column(Integer, primary_key=True)
-    scenario_id = Column(Integer, ForeignKey('scenarios.id'))
+    scenario_id = Column(Integer, ForeignKey('scenarios.id', ondelete='cascade'))
     text = Column(Unicode(200))
 
-    scenario = relationship('Scenario', back_populates='voice_commands')
+    scenario = relationship('Scenario', back_populates='commands')
 
     def __repr__(self):
-        return "<VoiceCommand('%s')>" % self.text
+        return "<Command('%s')>" % self.text

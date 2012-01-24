@@ -15,24 +15,33 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from models import Base
-from models.voice_command import VoiceCommand
-from models.scenario import Scenario
-from models.association import Association
 from models.actions import Action
-from models.actions.weather import Weather
 from models.actions.datetime import Datetime
 from models.actions.feed import Feed
+from models.actions.weather import Weather
+from models.association import Association
+from models.command import Command
+from models.scenario import Scenario
 from sqlalchemy.engine import create_engine
+from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 import logging
+import os
 
 
 logger = logging.getLogger(__name__)
-Session = sessionmaker()
 
 
 def initDb(path):
+    """Initialize database (create/update) and returns a sessionmaker to it
+
+    :return: a session maker object
+    :rtype: SessionMaker
+
+    """
     logger.info(u'Initializing database')
     engine = create_engine('sqlite:///' + path)
-    Session.configure(bind=engine)
-    Base.metadata.create_all(engine)
+    if not os.path.exists(path):
+        logger.debug(u'Database does not exist, creating...')
+        Base.metadata.create_all(engine)
+    return sessionmaker(bind=engine)

@@ -30,9 +30,9 @@ class Scenario(Base):
     """
     __tablename__ = 'scenarios'
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode(50))
+    name = Column(Unicode(50), unique=True)
 
-    voice_commands = relationship('VoiceCommand', back_populates='scenario')
+    commands = relationship('Command', back_populates='scenario')
     associations = relationship('Association', back_populates='scenario', order_by='Association.order',
                                 collection_class=attribute_mapped_collection('order'))
     actions = association_proxy('associations', 'action', creator=lambda k, v: Association(order=k, action=v))

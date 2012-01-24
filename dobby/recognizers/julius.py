@@ -37,10 +37,10 @@ class Julius(Recognizer):
         super(Julius, self).__init__()
         self.client = pyjulius.Client(host, port, encoding)
         self.min_score = min_score
-        self.client.connect()
 
     def run(self):
         """Run the recognition and :meth:`~dobby.recognizers.Recognizer.publish` the recognized :class:`pyjulius.Sentence` objects"""
+        self.client.connect()
         self.client.start()
         while not self._stop:
             try:

@@ -14,10 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from dobby.models.voice_command import VoiceCommand
+from dobby.models.command import Command
 from models.actions import Action
 from models.scenario import Scenario
-from triggers import VoiceCommandEvent, RecognitionEvent
+from triggers import CommandEvent, RecognitionEvent
 import Queue
 import logging
 import random
@@ -35,8 +35,8 @@ class Controller(threading.Thread):
     :param Queue.Queue event_queue: where to listen for events
     :param Queue.Queue tts_queue: where to put the tts from processed actions
     :param Session session: Dobby database session
-    :param integer recognition_timeout: time to wait for a :class:`~dobby.models.voice_command.VoiceCommand` to be recognized once a :class:`RecognitionEvent` is received
-    :param string failed_message: error message to say when the recognized :class:`~dobby.models.voice_command.VoiceCommand` does not match anything in the database
+    :param integer recognition_timeout: time to wait for a :class:`~dobby.models.command.Command` to be recognized once a :class:`RecognitionEvent` is received
+    :param string failed_message: error message to say when the recognized :class:`~dobby.models.command.Command` does not match anything in the database
     :param list confirmation_messages: a random message to say is picked and sent to the action queue whenever a :class:`RecognitionEvent` is caught
 
     """
@@ -63,10 +63,10 @@ class Controller(threading.Thread):
             except Queue.Empty:
                 continue
             
-            # Fire a Scenario directly if the event is an VoiceCommandEvent
-            if isinstance(event, VoiceCommandEvent):
-                logger.debug(u'VoiceCommandEvent caught with command "%s"' % event.voice_command)
-                scenario = self.session.query(Scenario).join(VoiceCommand).filter(VoiceCommand.text == event.voice_command).first()
+            # Fire a Scenario directly if the event is an CommandEvent
+            if isinstance(event, CommandEvent):
+                logger.debug(u'CommandEvent caught with command "%s"' % event.command)
+                scenario = self.session.query(Scenario).join(Command).filter(Command.text == event.command).first()
 
             # Launch recognition and analyze the first voice command
             elif isinstance(event, RecognitionEvent):
@@ -78,9 +78,9 @@ class Controller(threading.Thread):
                 self.recognizer.subscribe(recognition_queue)
                 try:
                     recognition = recognition_queue.get(timeout=self.recognition_timeout)
-                    recognized_voice_command = unicode(recognition)
-                    logger.debug(u'RecognitionEvent caught with voice command "%s"' % recognized_voice_command)
-                    scenario = self.session.query(Scenario).join(VoiceCommand).filter(VoiceCommand.text == recognized_voice_command).first()
+                    recognized_command = unicode(recognition)
+                    logger.debug(u'RecognitionEvent caught with voice command "%s"' % recognized_command)
+                    scenario = self.session.query(Scenario).join(Command).filter(Command.text == recognized_command).first()
                 except Queue.Empty:
                     scenario = None
                     pass

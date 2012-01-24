@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2011 Antoine Bertin <diaoulael@gmail.com>
 #
 # This file is part of Dobby.
@@ -15,15 +14,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-
 from Queue import Queue
 from configobj import ConfigObj, flatten_errors
 from dobby.controller import Controller
-from dobby.db import initDb, Session
+from dobby.db import initDb
 from dobby.recognizers.julius import Julius as JuliusRecognizer
 from dobby.speakers.speechdispatcher import SpeechDispatcher
 from dobby.triggers.clapper import Pattern, QuietPattern, NoisyPattern, Clapper
 from dobby.triggers.julius import Julius as JuliusTrigger
+from sqlalchemy.orm import scoped_session
 from validate import Validator, VdtValueError, VdtTypeError
 import atexit
 import logging.handlers
@@ -48,12 +47,12 @@ class Application(object):
         self.verbose = verbose
         self.daemon = daemon
         self.use_signal = use_signal
-        self._stop = False
         self.event_queue = Queue()
         self.tts_queue = Queue()
         self.config = initConfig(self.configfile)
         initLogging(self.quiet or self.daemon, self.verbose, os.path.join(self.datadir, 'logs'))
-        initDb(os.path.join(self.datadir, 'dobby.db'))
+        self.Session = scoped_session(initDb(os.path.join(self.datadir, 'dobby.db')))
+        self.running = False
 
     def daemonize(self):
         """Do the UNIX double-fork magic, see Stevens' "Advanced
@@ -99,7 +98,7 @@ class Application(object):
 
     def stop(self):
         """Stop the application"""
-        if self._stop:
+        if not self.running:
             return
         if self.config['General']['bye_message']:
             self.tts_queue.put(self.config['General']['bye_message'])
@@ -113,21 +112,20 @@ class Application(object):
         self.speaker.stop()
         self.speaker.join()
         self.config.write()
-        self._stop = True
+        self.running = False
 
     def run(self):
-        # Init recognizer
+        self.running = True
         self.recognizer = initRecognizer(self.config['Recognizer'])
-    
-        # Init triggers
+        self.recognizer.start()
         self.triggers = initTriggers(self.event_queue, self.recognizer, self.config['Trigger'])
-    
-        # Init speaker
+        for trigger in self.triggers:
+            trigger.start()
         self.speaker = initSpeaker(self.tts_queue, self.config['Speaker'])
-    
-        # Start controller
-        self.controller = initController(self.event_queue, self.tts_queue, self.recognizer, self.config['General'])
-        
+        self.speaker.start()
+        self.controller = initController(self.event_queue, self.tts_queue, self.Session(), self.recognizer, self.config['General'])
+        self.controller.start()
+
         # Welcome message
         if self.config['General']['welcome_message']:
             self.tts_queue.put(self.config['General']['welcome_message'])
@@ -138,8 +136,9 @@ class Application(object):
             signal.signal(signal.SIGTERM, self.signal_handler)
         
         # Wait until it's time to exit
-        while not self._stop:
+        while self.running:
             time.sleep(1)
+        #TODO: Error handling of prematurate child death
 
     def signal_handler(self, *args):
         logger.info(u'Stop signal caught')
@@ -164,12 +163,10 @@ def initTriggers(event_queue, recognizer, config):
             pattern = Pattern([QuietPattern(1), NoisyPattern(1, 4), QuietPattern(1, 6), NoisyPattern(1, 4), QuietPattern(1)])
             trigger = Clapper(event_queue, config['Clapper']['device_index'], pattern, config['Clapper']['threshold'],
                         config['Clapper']['channels'], config['Clapper']['rate'], config['Clapper']['block_time'])
-            trigger.start()
             triggers.append(trigger)
             logger.debug(u'Trigger clapper initialized')
         elif trigger_name == 'julius':
             trigger = JuliusTrigger(event_queue, config['Julius']['sentence'], recognizer, config['Julius']['action'])
-            trigger.start()
             triggers.append(trigger)
             logger.debug(u'Trigger julius initialized')
     return triggers
@@ -184,7 +181,6 @@ def initRecognizer(config):
     """
     if config['recognizer'] == 'julius':
         recognizer = JuliusRecognizer(config['Julius']['host'], config['Julius']['port'], config['Julius']['encoding'], config['Julius']['min_score'])
-        recognizer.start()
     return recognizer
 
 def initSpeaker(tts_queue, config):
@@ -200,22 +196,21 @@ def initSpeaker(tts_queue, config):
         speaker = SpeechDispatcher(tts_queue, 'Dobby', str(config['SpeechDispatcher']['engine']), str(config['SpeechDispatcher']['voice']),
                           str(config['SpeechDispatcher']['language']), config['SpeechDispatcher']['volume'],
                           config['SpeechDispatcher']['rate'], config['SpeechDispatcher']['pitch'])
-    speaker.start()
     return speaker
 
-def initController(event_queue, tts_queue, recognizer, config):
+def initController(event_queue, tts_queue, session, recognizer, config):
     """Initialize the Controller as defined in the config
 
     :param Queue.Queue event_queue: where events are taken from
     :param Queue.Queue tts_queue: where actions are put into
+    :param Session session: a SQLAlchemy database session
     :param Recognizer recognizer: the recognizer instance
     :param dict config: general settings
     :return: controller
     :rtype: Controller
 
     """
-    controller = Controller(event_queue, tts_queue, Session(), recognizer, config['recognition_timeout'], config['failed_message'], config['confirmation_messages'])
-    controller.start()
+    controller = Controller(event_queue, tts_queue, session, recognizer, config['recognition_timeout'], config['failed_message'], config['confirmation_messages'])
     return controller
 
 def initLogging(quiet, verbose, log_dir):

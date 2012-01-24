@@ -40,7 +40,7 @@ def main():
         pa = pyaudio.PyAudio()
         for i in range(pa.get_device_count()):
             device_infos = pa.get_device_info_by_index(i)
-            print device_infos['name'] + "\t" + str(device_infos['index'])
+            print device_infos['name'] + '\t' + str(device_infos['index'])
         sys.exit(0)
 
     # Run the application

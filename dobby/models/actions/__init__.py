@@ -17,7 +17,7 @@
 from .. import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer, UnicodeText, String
+from sqlalchemy.types import Integer, UnicodeText, String, Unicode
 
 
 class Action(Base):
@@ -41,6 +41,7 @@ class Action(Base):
     """
     __tablename__ = 'actions'
     id = Column(Integer, primary_key=True)
+    name = Column(Unicode(50), unique=True)
     tts = Column(UnicodeText)
     
     discriminator = Column('type', String(50))
