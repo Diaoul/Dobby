@@ -106,7 +106,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         result = dialog.exec_()
         if result != QDialog.Accepted:
             return
-        print dialog.qleName.text()
+        self.session.add(dialog.getAction())
+        self.session.commit()
 #        self.actionModel.addAction(self.)
 
     def startDobby(self):

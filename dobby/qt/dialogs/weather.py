@@ -14,11 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
+from ..timers import DelayedExecutionTimer
+from ..ui.action_weather_ui import Ui_ActionWeatherDialog
 from PySide.QtCore import *
 from PySide.QtGui import *
 from dobby.models.actions.weather import Weather
-from ..timers import DelayedExecutionTimer
-from ..ui.action_weather_ui import Ui_ActionWeatherDialog
 import pywunderground
 
 
@@ -42,8 +42,10 @@ class ActionWeatherForm(QDialog, Ui_ActionWeatherDialog):
         self.qleCity.setCompleter(completer)
 
     def getAction(self):
-        cities = [city for city in self.completer.cities if city['name'] == self.qleName.text()]
-        return Weather(name=self.qleName.text(), tts=self.qpteTTS.toPlainText(), query=cities[0])
+        cities = [city for city in self.completer.cities if city['name'] == self.qleCity.text()]
+        print repr(self.completer.cities)
+        print repr(cities)
+        return Weather(name=self.qleName.text(), tts=self.qpteTTS.toPlainText(), query=cities[0]['l'].replace('/q/', ''))
 
     def accept(self):
         if self.qleCity.text() not in [city['name'] for city in self.completer.cities]:
