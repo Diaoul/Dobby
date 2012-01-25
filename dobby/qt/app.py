@@ -17,10 +17,14 @@
 from ..app import Application as Dobby
 from PySide.QtCore import *
 from PySide.QtGui import *
+from dobby.models.actions.datetime import Datetime
+from dobby.models.actions.weather import Weather
+from dobby.qt.dialogs.datetime import ActionDatetimeForm
 from dobby.qt.dialogs.weather import ActionWeatherForm
 from dobby.qt.models import ScenarioModel, ScenarioCommandModel, \
     ScenarioActionModel, ActionModel
 from ui.main_ui import Ui_MainWindow
+import dobby.infos
 import os.path
 import pyjulius.exceptions
 import time
@@ -49,8 +53,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.qlvScenarios.setModel(self.scenarioModel)
         self.scenarioCommandModel = ScenarioCommandModel(self.session)
         self.qlvScenarioCommands.setModel(self.scenarioCommandModel)
-        self.scenarioActionsModel = ScenarioActionModel(self.session)
-        self.qlvScenarioActions.setModel(self.scenarioActionsModel)
+        self.scenarioActionModel = ScenarioActionModel(self.session)
+        self.qlvScenarioActions.setModel(self.scenarioActionModel)
 
         # Action Model
         self.actionModel = ActionModel(self.session)
@@ -62,19 +66,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.qpbScenarioCommandAdd.clicked.connect(self.addScenarioCommand)
         self.qpbScenarioCommandRemove.clicked.connect(self.removeScenarioCommand)
         self.qlvScenarios.selectionModel().selectionChanged.connect(self.changeScenario)
+        self.qlvScenarioActions.doubleClicked.connect(self.removeScenarioAction)
 
         # Action Signals
         self.qpbActionAdd.clicked.connect(self.addAction)
-#        self.qpbActionRemove.clicked.connect(self.removeAction)
+        self.qpbActionRemove.clicked.connect(self.removeAction)
+        self.qlvActions.doubleClicked.connect(self.editAction)
 
         # Dobby Signals
         self.qaStart.triggered.connect(self.startDobby)
         self.qaStop.triggered.connect(self.stopDobby)
+        
+        # Others
+        self.qaAbout.triggered.connect(self.about)
+
+    @Slot()
+    def about(self):
+        QMessageBox.about(self, 'About Dobby', 'Dobby v' + dobby.infos.__version__ + '\n\n' + 'Dobby is free! (GPLv3 licensed software)')
 
     @Slot(QModelIndex, QModelIndex)
     def changeScenario(self, selected, deselected):
-        self.scenarioCommandModel.commands = self.scenarioModel.scenarios[selected.indexes()[0].row()].commands
-        self.qlvScenarioCommands.reset()
+        self.scenarioCommandModel.setCommands(self.scenarioModel.scenarios[selected.indexes()[0].row()].commands)
+        self.scenarioActionModel.setActions(self.scenarioModel.scenarios[selected.indexes()[0].row()].actions)
 
     @Slot()
     def addScenario(self):
@@ -101,14 +114,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.scenarioCommandModel.removeCommand(self.qlvScenarioCommands.currentIndex().row())
 
     @Slot()
+    def removeScenarioAction(self):
+        self.scenarioActionModel.removeAction(self.qlvScenarioActions.currentIndex().row())
+
+    @Slot()
     def addAction(self):
-        dialog = ActionWeatherForm(self)
+        if self.qcbActionType.currentText() == 'Weather':
+            dialog = ActionWeatherForm(self)
+        elif self.qcbActionType.currentText() == 'Datetime':
+            dialog = ActionDatetimeForm(self)
+        elif self.qcbActionType.currentText() == 'Feed':
+            dialog = ActionWeatherForm(self)
+        result = dialog.exec_()
+        if result != QDialog.Accepted:
+            return
+        self.actionModel.addAction(dialog.getAction())
+
+    @Slot()
+    def removeAction(self):
+        self.actionModel.removeAction(self.qlvActions.currentIndex().row())
+
+    @Slot(QModelIndex)
+    def editAction(self, index):
+        action = self.actionModel.actions[index.row()]
+        if isinstance(action, Weather):
+            dialog = ActionWeatherForm(self)
+        elif isinstance(action, Datetime):
+            dialog = ActionDatetimeForm(self)
+        dialog.fromAction(self.actionModel.actions[index.row()])
         result = dialog.exec_()
         if result != QDialog.Accepted:
             return
         self.session.add(dialog.getAction())
         self.session.commit()
-#        self.actionModel.addAction(self.)
 
     def startDobby(self):
         try:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ActionWeatherDialog</class>
- <widget class="QDialog" name="ActionWeatherDialog">
+ <class>ActionDatetimeDialog</class>
+ <widget class="QDialog" name="ActionDatetimeDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -47,11 +47,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QPlainTextEdit" name="qpteTTS">
-        <property name="tabChangesFocus">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <widget class="QPlainTextEdit" name="qpteTTS"/>
       </item>
       <item row="2" column="0" colspan="2">
        <widget class="QLabel" name="qlDocumentation">
@@ -69,29 +65,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="qgbWeather">
-     <property name="title">
-      <string>Weather settings</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="qlCity">
-        <property name="text">
-         <string>City</string>
-        </property>
-        <property name="buddy">
-         <cstring>qleCity</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="qleCity"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="qdbbValidate">
+    <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -105,15 +79,14 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>qleName</tabstop>
   <tabstop>qpteTTS</tabstop>
-  <tabstop>qleCity</tabstop>
-  <tabstop>qdbbValidate</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>qdbbValidate</sender>
+   <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>ActionWeatherDialog</receiver>
+   <receiver>ActionDatetimeDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -127,9 +100,9 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>qdbbValidate</sender>
+   <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>ActionWeatherDialog</receiver>
+   <receiver>ActionDatetimeDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

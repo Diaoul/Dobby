@@ -20,6 +20,7 @@ from dobby.models.actions import Action
 from dobby.models.command import Command
 from dobby.models.scenario import Scenario
 from sqlalchemy.orm import joinedload
+import pickle
 
 
 class ScenarioModel(QAbstractListModel):
@@ -112,22 +113,63 @@ class ScenarioCommandModel(QAbstractListModel):
         self.session.commit()
         self.endRemoveRows()
 
+    def setCommands(self, commands):
+        self.beginResetModel()
+        self.commands = commands
+        self.endResetModel()
+
 
 class ScenarioActionModel(QAbstractListModel):
     def __init__(self, session, parent=None):
         super(ScenarioActionModel, self).__init__(parent)
-        self.actions = []
+        self.session = session
+        self.actions = {}
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.actions)
 
+    def dropMimeData(self, data, action, row, column, parent):
+        action_ids = pickle.loads(data.data('application/x-action-id'))
+        for action_id in action_ids:
+            self.addAction(self.session.query(Action).get(action_id))
+        return True
+
+    def mimeTypes(self):
+        return ['application/x-action-id']
+
+    def flags(self, index):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+
     def data(self, index, role=Qt.DisplayRole):
-        action = self.actions[index.row()]
+        action = self.actions[sorted(self.actions.keys())[index.row()]]
         if not action:
             return None
         if role == Qt.DisplayRole:
             return action.name
+        if role == Qt.DecorationRole:
+            return QIcon(':/actions/%s' % action.discriminator)
         return None
+
+    def setActions(self, actions):
+        self.beginResetModel()
+        self.actions = actions
+        self.endResetModel()
+
+    def addAction(self, action):
+        self.beginInsertRows(QModelIndex(), len(self.actions), len(self.actions))
+        if self.actions:
+            order = max(self.actions.keys()) + 1
+        else:
+            order = 1
+        self.actions[order] = action
+        self.session.commit()
+        self.endInsertRows()
+
+    def removeAction(self, index):
+        self.beginRemoveRows(QModelIndex(), index, index)
+        del self.actions[sorted(self.actions.keys())[index]]
+        self.session.commit()
+        self.endRemoveRows()
 
 
 class ActionModel(QAbstractListModel):
@@ -149,14 +191,27 @@ class ActionModel(QAbstractListModel):
             return QIcon(':/actions/%s' % action.discriminator)
         return None
 
-    def flags(self, index):
-        return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
+    def mimeData(self, indexes):
+        mimedata = QMimeData()
+        mimedata.setData('application/x-action-id', pickle.dumps([self.actions[index.row()].id for index in indexes]))
+        return mimedata
 
-    def setData(self, index, value, role=Qt.EditRole):
-        if role != Qt.EditRole or not value:
-            return False
-        action = self.actions[index.row()]
-        action.name = value
+    def mimeTypes(self):
+        return ['application/x-action-id']
+
+    def flags(self, index):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+
+    def addAction(self, action):
+        self.beginInsertRows(QModelIndex(), len(self.actions), len(self.actions))
+        self.session.add(action)
         self.session.commit()
-        self.dataChanged.emit(index, index)
-        return True
+        self.actions.append(action)
+        self.endInsertRows()
+
+    def removeAction(self, index):
+        self.beginRemoveRows(QModelIndex(), index, index)
+        action = self.actions.pop(index)
+        self.session.delete(action)
+        self.session.commit()
+        self.endRemoveRows()

@@ -27,6 +27,7 @@ class ActionWeatherForm(QDialog, Ui_ActionWeatherDialog):
         super(ActionWeatherForm, self).__init__(parent)
         self.setModal(True)
         self.setupUi(self)
+        self.action = None
         
         # City Completer
         self.completer = WeatherCityCompleter(self.qleCity)
@@ -42,13 +43,24 @@ class ActionWeatherForm(QDialog, Ui_ActionWeatherDialog):
         self.qleCity.setCompleter(completer)
 
     def getAction(self):
+        if not self.action:
+            self.action = Weather()
         cities = [city for city in self.completer.cities if city['name'] == self.qleCity.text()]
-        print repr(self.completer.cities)
-        print repr(cities)
-        return Weather(name=self.qleName.text(), tts=self.qpteTTS.toPlainText(), query=cities[0]['l'].replace('/q/', ''))
+        self.action.name = self.qleName.text()
+        self.action.tts = self.qpteTTS.toPlainText()
+        if cities:
+            self.action.city_name = cities[0]['name']
+            self.action.query = cities[0]['l'].replace('/q/', '')
+        return self.action
+
+    def fromAction(self, action):
+        self.action = action
+        self.qleName.setText(action.name)
+        self.qpteTTS.setPlainText(action.tts)
+        self.qleCity.setText(action.city_name)
 
     def accept(self):
-        if self.qleCity.text() not in [city['name'] for city in self.completer.cities]:
+        if (not self.action or self.qleCity.text() != self.action.city_name) and self.qleCity.text() not in [city['name'] for city in self.completer.cities]:
             QMessageBox.information(self, 'Invalid city', 'The city you entered is invalid, please correct it or cancel', QMessageBox.Ok)
             return
         super(ActionWeatherForm, self).accept()

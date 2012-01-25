@@ -91,7 +91,11 @@
            <number>0</number>
           </property>
           <item row="0" column="0">
-           <widget class="QListView" name="qlvScenarioActions"/>
+           <widget class="QListView" name="qlvScenarioActions">
+            <property name="dragDropMode">
+             <enum>QAbstractItemView::DropOnly</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -178,7 +182,17 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QListView" name="qlvActions"/>
+        <widget class="QListView" name="qlvActions">
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::DragOnly</enum>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::CopyAction</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="qhblActionEdit">
