@@ -92,8 +92,14 @@
           </property>
           <item row="0" column="0">
            <widget class="QListView" name="qlvScenarioActions">
+            <property name="dragEnabled">
+             <bool>true</bool>
+            </property>
             <property name="dragDropMode">
-             <enum>QAbstractItemView::DropOnly</enum>
+             <enum>QAbstractItemView::DragDrop</enum>
+            </property>
+            <property name="defaultDropAction">
+             <enum>Qt::MoveAction</enum>
             </property>
            </widget>
           </item>

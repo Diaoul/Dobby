@@ -129,16 +129,29 @@ class ScenarioActionModel(QAbstractListModel):
         return len(self.actions)
 
     def dropMimeData(self, data, action, row, column, parent):
-        action_ids = pickle.loads(data.data('application/x-action-id'))
-        for action_id in action_ids:
-            self.addAction(self.session.query(Action).get(action_id))
+        if action == Qt.DropAction.CopyAction:
+            action_ids = pickle.loads(data.data('application/x-action-id'))
+            for action_id in action_ids:
+                self.insertAction(self.session.query(Action).get(action_id), row if row != -1 else len(self.actions))
+        elif action == Qt.DropAction.MoveAction:
+            indexes = pickle.loads(data.data('application/x-scenarioaction-index'))
+            for index in indexes:
+                self.moveAction(index, row if row != -1 else len(self.actions))
         return True
 
+    def supportedDropActions(self):
+        return Qt.DropAction.CopyAction | Qt.DropAction.MoveAction
+
     def mimeTypes(self):
-        return ['application/x-action-id']
+        return ['application/x-action-id', 'application/x-scenarioaction-index']
+
+    def mimeData(self, indexes):
+        mimedata = QMimeData()
+        mimedata.setData('application/x-scenarioaction-index', pickle.dumps([index.row() for index in indexes]))
+        return mimedata
 
     def flags(self, index):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
 
     def data(self, index, role=Qt.DisplayRole):
         action = self.actions[sorted(self.actions.keys())[index.row()]]
@@ -154,6 +167,29 @@ class ScenarioActionModel(QAbstractListModel):
         self.beginResetModel()
         self.actions = actions
         self.endResetModel()
+
+    def insertAction(self, action, index):
+        self.beginInsertRows(QModelIndex(), index, index)
+        orders = self.actions.keys()
+        actions = self.actions.values()
+        orders.insert(index, None)
+        actions.insert(index, action)
+        for i in range(len(orders)):
+            self.actions[i] = actions[i]
+        self.session.commit()
+        self.endInsertRows()
+
+    def moveAction(self, from_index, to_index):
+        self.beginMoveRows(QModelIndex(), from_index, from_index, QModelIndex(), to_index)
+        orders = self.actions.keys()
+        actions = self.actions.values()
+        orders.pop(from_index)
+        actions.insert(to_index, actions.pop(from_index))
+        orders.insert(to_index, None)
+        for i in range(len(orders)):
+            self.actions[i] = actions[i]
+        self.session.commit()
+        self.endMoveRows()
 
     def addAction(self, action):
         self.beginInsertRows(QModelIndex(), len(self.actions), len(self.actions))
