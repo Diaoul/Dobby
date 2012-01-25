@@ -17,7 +17,7 @@
 from . import Action
 from sqlalchemy.orm.mapper import reconstructor
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Integer, String
+from sqlalchemy.types import Integer, String, Unicode
 import logging
 import pywunderground
 
@@ -48,6 +48,7 @@ class Weather(Action):
     __tablename__ = 'weather_actions'
     __mapper_args__ = {'polymorphic_identity': 'weather'}
     id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
+    city_name = Column(Unicode(50))
     query = Column(String(30))
 
     def __init__(self, **kwargs):

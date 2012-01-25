@@ -50,7 +50,7 @@ class Association(Base):
     __tablename__ = 'associations'
     scenario_id = Column(Integer, ForeignKey('scenarios.id'), primary_key=True)
     action_id = Column(Integer, ForeignKey('actions.id'), primary_key=True)
-    order = Column(Integer)
+    order = Column(Integer, primary_key=True)
 
     scenario = relationship('Scenario', back_populates='associations')
     action = relationship('Action', back_populates='associations')

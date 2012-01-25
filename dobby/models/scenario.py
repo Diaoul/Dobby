@@ -34,7 +34,7 @@ class Scenario(Base):
 
     commands = relationship('Command', back_populates='scenario')
     associations = relationship('Association', back_populates='scenario', order_by='Association.order',
-                                collection_class=attribute_mapped_collection('order'))
+                                collection_class=attribute_mapped_collection('order'), cascade='all, delete-orphan')
     actions = association_proxy('associations', 'action', creator=lambda k, v: Association(order=k, action=v))
 
     def __repr__(self):
