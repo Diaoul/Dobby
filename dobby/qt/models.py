@@ -126,9 +126,11 @@ class ScenarioActionModel(QAbstractListModel):
         self.actions = {}
 
     def rowCount(self, parent=QModelIndex()):
+        """Number of actions associated with a scenario"""
         return len(self.actions)
 
     def dropMimeData(self, data, action, row, column, parent):
+        """Copy an action from the ActionModel or move an action from itself to another index"""
         if action == Qt.DropAction.CopyAction:
             action_ids = pickle.loads(data.data('application/x-action-id'))
             for action_id in action_ids:
@@ -140,20 +142,25 @@ class ScenarioActionModel(QAbstractListModel):
         return True
 
     def supportedDropActions(self):
+        """Allow Copy and Move drop actions"""
         return Qt.DropAction.CopyAction | Qt.DropAction.MoveAction
 
     def mimeTypes(self):
+        """Supported mimetypes"""
         return ['application/x-action-id', 'application/x-scenarioaction-index']
 
     def mimeData(self, indexes):
+        """Serialize the indexes to move in a special mimetype that is used when dragging occurs"""
         mimedata = QMimeData()
         mimedata.setData('application/x-scenarioaction-index', pickle.dumps([index.row() for index in indexes]))
         return mimedata
 
     def flags(self, index):
+        """Enable drag and drop"""
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
 
     def data(self, index, role=Qt.DisplayRole):
+        """Show the scenario action names as a list and use the action type to display an icon"""
         action = self.actions[sorted(self.actions.keys())[index.row()]]
         if not action:
             return None
@@ -164,11 +171,13 @@ class ScenarioActionModel(QAbstractListModel):
         return None
 
     def setActions(self, actions):
+        """Resets the model with new actions"""
         self.beginResetModel()
         self.actions = actions
         self.endResetModel()
 
     def insertAction(self, action, index):
+        """Insert an action to the specified index"""
         self.beginInsertRows(QModelIndex(), index, index)
         orders = self.actions.keys()
         actions = self.actions.values()
@@ -180,6 +189,9 @@ class ScenarioActionModel(QAbstractListModel):
         self.endInsertRows()
 
     def moveAction(self, from_index, to_index):
+        """Change the order of the actions in the scenario"""
+        if to_index == len(self.actions) and from_index == to_index - 1:
+            return
         self.beginMoveRows(QModelIndex(), from_index, from_index, QModelIndex(), to_index)
         orders = self.actions.keys()
         actions = self.actions.values()
@@ -191,17 +203,8 @@ class ScenarioActionModel(QAbstractListModel):
         self.session.commit()
         self.endMoveRows()
 
-    def addAction(self, action):
-        self.beginInsertRows(QModelIndex(), len(self.actions), len(self.actions))
-        if self.actions:
-            order = max(self.actions.keys()) + 1
-        else:
-            order = 1
-        self.actions[order] = action
-        self.session.commit()
-        self.endInsertRows()
-
     def removeAction(self, index):
+        """Detach an action from the Scenario"""
         self.beginRemoveRows(QModelIndex(), index, index)
         del self.actions[sorted(self.actions.keys())[index]]
         self.session.commit()
@@ -209,15 +212,18 @@ class ScenarioActionModel(QAbstractListModel):
 
 
 class ActionModel(QAbstractListModel):
+    """Action model that supports dragging its action ids. Actions are queried over the session"""
     def __init__(self, session, parent=None):
         super(ActionModel, self).__init__(parent)
         self.session = session
         self.actions = self.session.query(Action).all()
 
     def rowCount(self, parent=QModelIndex()):
+        """Number of actions"""
         return len(self.actions)
 
     def data(self, index, role=Qt.DisplayRole):
+        """Show the action names as a list and use the action type to display an icon"""
         action = self.actions[index.row()]
         if not action:
             return None
@@ -228,17 +234,21 @@ class ActionModel(QAbstractListModel):
         return None
 
     def mimeData(self, indexes):
+        """Serialize the action ids in a special mimetype that is used when dragging occurs"""
         mimedata = QMimeData()
         mimedata.setData('application/x-action-id', pickle.dumps([self.actions[index.row()].id for index in indexes]))
         return mimedata
 
     def mimeTypes(self):
+        """Supported mimetypes"""
         return ['application/x-action-id']
 
     def flags(self, index):
+        """Allow dragging"""
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
     def addAction(self, action):
+        """Add an action to the database"""
         self.beginInsertRows(QModelIndex(), len(self.actions), len(self.actions))
         self.session.add(action)
         self.session.commit()
@@ -246,6 +256,7 @@ class ActionModel(QAbstractListModel):
         self.endInsertRows()
 
     def removeAction(self, index):
+        """Remove an action from the database"""
         self.beginRemoveRows(QModelIndex(), index, index)
         action = self.actions.pop(index)
         self.session.delete(action)
