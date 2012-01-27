@@ -128,11 +128,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         result = dialog.exec_()
         if result != QDialog.Accepted:
             return
-        self.actionModel.addAction(dialog.getAction())
+        self.actionModel.appendAction(dialog.getAction())
 
     @Slot()
     def removeAction(self):
-        self.actionModel.removeAction(self.qlvActions.currentIndex().row())
+        self.actionModel.removeActions(self.qlvActions.currentIndex().row())
 
     @Slot(QModelIndex)
     def editAction(self, index):

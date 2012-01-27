@@ -212,21 +212,18 @@ class ScenarioActionModel(QAbstractListModel):
 
 
 class ActionModel(QAbstractListModel):
-    """Action model that supports dragging its action ids. Actions are queried over the session"""
+    """Action model that supports dragging. This is a proxy to the Action model"""
+
     def __init__(self, session, parent=None):
         super(ActionModel, self).__init__(parent)
         self.session = session
         self.actions = self.session.query(Action).all()
 
     def rowCount(self, parent=QModelIndex()):
-        """Number of actions"""
         return len(self.actions)
 
     def data(self, index, role=Qt.DisplayRole):
-        """Show the action names as a list and use the action type to display an icon"""
         action = self.actions[index.row()]
-        if not action:
-            return None
         if role == Qt.DisplayRole:
             return action.name
         if role == Qt.DecorationRole:
@@ -234,31 +231,32 @@ class ActionModel(QAbstractListModel):
         return None
 
     def mimeData(self, indexes):
-        """Serialize the action ids in a special mimetype that is used when dragging occurs"""
-        mimedata = QMimeData()
+        mimeData = QMimeData()
+        itemData = QByteArray()
+        dataStream = QDataStream(itemData, QIODevice.WriteOnly)
         mimedata.setData('application/x-action-id', pickle.dumps([self.actions[index.row()].id for index in indexes]))
         return mimedata
 
     def mimeTypes(self):
-        """Supported mimetypes"""
         return ['application/x-action-id']
 
     def flags(self, index):
-        """Allow dragging"""
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
-    def addAction(self, action):
-        """Add an action to the database"""
-        self.beginInsertRows(QModelIndex(), len(self.actions), len(self.actions))
-        self.session.add(action)
+    def appendAction(self, action):
+        self.insertActions([action], self.rowCount())
+
+    def insertActions(self, actions, row=0):
+        self.beginInsertRows(QModelIndex(), row, row + len(actions) - 1)
+        for action in reversed(actions):
+            self.actions.insert(row, action)
+            self.session.add(action)
         self.session.commit()
-        self.actions.append(action)
         self.endInsertRows()
 
-    def removeAction(self, index):
-        """Remove an action from the database"""
-        self.beginRemoveRows(QModelIndex(), index, index)
-        action = self.actions.pop(index)
-        self.session.delete(action)
+    def removeActions(self, row, count=1):
+        self.beginRemoveRows(QModelIndex(), row, row + count - 1)
+        for i in range(row + count - 1, row - 1, -1):
+            self.session.delete(self.actions.pop(i))
         self.session.commit()
         self.endRemoveRows()
