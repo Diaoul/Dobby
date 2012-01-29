@@ -91,7 +91,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="qdbbValidate">
+    <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -106,12 +106,12 @@ p, li { white-space: pre-wrap; }
   <tabstop>qleName</tabstop>
   <tabstop>qpteTTS</tabstop>
   <tabstop>qleCity</tabstop>
-  <tabstop>qdbbValidate</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>qdbbValidate</sender>
+   <sender>buttonBox</sender>
    <signal>accepted()</signal>
    <receiver>ActionWeatherDialog</receiver>
    <slot>accept()</slot>
@@ -127,7 +127,7 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>qdbbValidate</sender>
+   <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>ActionWeatherDialog</receiver>
    <slot>reject()</slot>
