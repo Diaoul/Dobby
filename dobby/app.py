@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from Queue import Queue
-from configobj import ConfigObj, flatten_errors
+from configobj import flatten_errors
+from dobby.config import initConfig, validator
 from dobby.controller import Controller
 from dobby.db import initDb
 from dobby.recognizers.julius import Julius as JuliusRecognizer
@@ -23,7 +24,6 @@ from dobby.speakers.speechdispatcher import SpeechDispatcher
 from dobby.triggers.clapper import Pattern, QuietPattern, NoisyPattern, Clapper
 from dobby.triggers.julius import Julius as JuliusTrigger
 from sqlalchemy.orm import scoped_session
-from validate import Validator, VdtValueError, VdtTypeError
 import atexit
 import logging.handlers
 import os
@@ -144,7 +144,17 @@ class Application(object):
         logger.info(u'Stop signal caught')
         self.stop()
         exit(0)
-        
+
+    def write_default_config(self):
+        self.config.validate(validator, copy=True)
+        self.config.write()
+
+    def validate_config(self):
+        results = self.config.validate(validator, copy=True)
+        if results != True:
+            return flatten_errors(self.config, results)
+        return True
+
 
 def initTriggers(event_queue, recognizer, config):
     """Initialize all triggers as defined in the config
@@ -238,33 +248,3 @@ def initLogging(quiet, verbose, log_dir):
             handler.setLevel(logging.INFO)
         handlers.append(handler)
     root.handlers = handlers
-
-def initConfig(path='config.ini'):
-    """Initialize and validate the configuration file. If the validation test fails,
-    error messages are written to sys.stderr and we exit with status 1
-
-    :param string path: path to the configuration file
-    :return: the read configuration
-    :rtype: ConfigObj
-
-    """
-    def is_option_list(value, *args):
-        """Validator for a list of options"""
-        if not isinstance(value, list):
-            raise VdtTypeError(value)
-        for v in value:
-            if v not in args:
-                raise VdtValueError(v)
-        return value
-
-    config = ConfigObj(path, configspec=os.path.join(appdir, 'config.spec'), encoding='utf-8')
-    vtor = Validator({'option_list': is_option_list})
-    results = config.validate(vtor, copy=True)
-    if results != True:
-        for (section_list, key, _) in flatten_errors(config, results):
-            if key is not None:
-                sys.stderr.write('The "%s" key in the section "%s" failed validation\n' % (key, ', '.join(section_list)))
-            else:
-                sys.stderr.write('The following section was missing: %s\n' % ', '.join(section_list))
-        sys.exit(1)
-    return config

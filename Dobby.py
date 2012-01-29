@@ -34,7 +34,8 @@ def main():
     group_verbosity.add_argument('-v', '--verbose', action='store_true', help='verbose console output')
     parser.add_argument('--version', action='version', version=infos.__version__)
     args = parser.parse_args()
-    
+
+    # List devices
     if args.list_devices:
         import pyaudio
         pa = pyaudio.PyAudio()
@@ -43,9 +44,26 @@ def main():
             print device_infos['name'] + '\t' + str(device_infos['index'])
         sys.exit(0)
 
-    # Run the application
+    # Init the app
     app = Application(os.path.abspath(args.data_dir), configfile=args.configfile, pidfile=args.pidfile, quiet=args.quiet, verbose=args.verbose, daemon=args.daemon)
+
+    # Write default configuration
+    if not os.path.exists(app.configfile):
+        app.write_default_config()
+
+    # Validate configuration
+    results = app.validate_config()
+    if results != True:
+        for (section_list, key, _) in results:
+            if key is not None:
+                sys.stderr.write('The "%s" key in the section "%s" failed validation\n' % (key, ', '.join(section_list)))
+            else:
+                sys.stderr.write('The following section was missing: %s\n' % ', '.join(section_list))
+        sys.exit(1)
+
+    # Start the app
     app.start()
+
 
 if __name__ == '__main__':
     main()
