@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConfigDialog</class>
+ <widget class="QDialog" name="ConfigDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>380</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="qwTabGeneral">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="qlGeneralWelcomeMessage">
+         <property name="text">
+          <string>Welcome message</string>
+         </property>
+         <property name="buddy">
+          <cstring>qleGeneralWelcomeMessage</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="qleGeneralWelcomeMessage"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="qlGeneralFailedMessage">
+         <property name="text">
+          <string>Failed message</string>
+         </property>
+         <property name="buddy">
+          <cstring>qleGeneralFailedMessage</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="qleGeneralFailedMessage"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="qlGeneralConfirmationMessage">
+         <property name="text">
+          <string>Confirmation messages</string>
+         </property>
+         <property name="buddy">
+          <cstring>qleGeneralConfirmationMessage</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="qleGeneralConfirmationMessage"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="qlGeneralByeMessage">
+         <property name="text">
+          <string>Bye message</string>
+         </property>
+         <property name="buddy">
+          <cstring>qleGeneralByeMessage</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="qleGeneralByeMessage"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="qlGeneralRecognitionTimeout">
+         <property name="text">
+          <string>Recognition timeout</string>
+         </property>
+         <property name="buddy">
+          <cstring>qsbGeneralRecognitionTimeout</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QSpinBox" name="qsbGeneralRecognitionTimeout"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="qwTabSpeaker">
+      <attribute name="title">
+       <string>Speaker</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="qlSpeaker">
+         <property name="text">
+          <string>Speaker</string>
+         </property>
+         <property name="buddy">
+          <cstring>qcbSpeaker</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="qcbSpeaker">
+         <item>
+          <property name="text">
+           <string>SpeechDispatcher</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="qgbSpeakerSpeechDispatcher">
+         <property name="title">
+          <string>SpeechDispatcher</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="qlSpeakerSpeechDispatcherEngine">
+            <property name="text">
+             <string>Engine</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleSpeakerSpeechDispatcherEngine</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="qleSpeakerSpeechDispatcherEngine"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="qlSpeakerSpeechDispatcherVoice">
+            <property name="text">
+             <string>Voice</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleSpeakerSpeechDispatcherVoice</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="qleSpeakerSpeechDispatcherVoice"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="qlSpeakerSpeechDispatcherLanguage">
+            <property name="text">
+             <string>Language</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleSpeakerSpeechDispatcherLanguage</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="qleSpeakerSpeechDispatcherLanguage"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="qlSpeakerSpeechDispatcherVolume">
+            <property name="text">
+             <string>Volume</string>
+            </property>
+            <property name="buddy">
+             <cstring>qsbSpeakerSpeechDispatcherVolume</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="qsbSpeakerSpeechDispatcherVolume">
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="qlSpeakerSpeechDispatcherRate">
+            <property name="text">
+             <string>Rate</string>
+            </property>
+            <property name="buddy">
+             <cstring>qsbSpeakerSpeechDispatcherRate</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="qsbSpeakerSpeechDispatcherRate">
+            <property name="minimum">
+             <number>-100</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="qlSpeakerSpeechDispatcherPitch">
+            <property name="text">
+             <string>Pitch</string>
+            </property>
+            <property name="buddy">
+             <cstring>qsbSpeakerSpeechDispatcherPitch</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QSpinBox" name="qsbSpeakerSpeechDispatcherPitch">
+            <property name="minimum">
+             <number>-100</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="qwTabRecognizer">
+      <attribute name="title">
+       <string>Recognizer</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_5">
+       <item row="0" column="0">
+        <widget class="QLabel" name="qleRecognizer">
+         <property name="text">
+          <string>Recognizer</string>
+         </property>
+         <property name="buddy">
+          <cstring>qcbRecognizer</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="qcbRecognizer">
+         <item>
+          <property name="text">
+           <string>Julius</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="qgbRecognizerJulius">
+         <property name="title">
+          <string>Julius</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_4">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="qlRecognizerJuliusHost">
+            <property name="text">
+             <string>Host</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleRecognizerJuliusHost</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="qleRecognizerJuliusHost"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="qlRecognizerJuliusPort">
+            <property name="text">
+             <string>Port</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleRecognizerJuliusPort</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="qleRecognizerJuliusPort"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="qlRecognizerJuliusEncoding">
+            <property name="text">
+             <string>Encoding</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleRecognizerJuliusEncoding</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="qleRecognizerJuliusEncoding"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="qlRecognizerJuliusMinimumScore">
+            <property name="text">
+             <string>Minimum score</string>
+            </property>
+            <property name="buddy">
+             <cstring>qsbRecognizerJuliusMinimumScore</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="qsbRecognizerJuliusMinimumScore">
+            <property name="maximum">
+             <number>8000</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="qwTabTrigger">
+      <attribute name="title">
+       <string>Trigger</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QGroupBox" name="qbgTriggerClapper">
+         <property name="title">
+          <string>Clapper</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_7">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="qcbTriggerClapperEnabled">
+            <property name="text">
+             <string>Enabled</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="qlTriggerClapperDeviceIndex">
+            <property name="text">
+             <string>Device index</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleTriggerClapperDeviceIndex</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="qleTriggerClapperDeviceIndex"/>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="qdsbTriggerClapperBlockTime"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="qlTriggerClapperBlockTime">
+            <property name="text">
+             <string>Block time</string>
+            </property>
+            <property name="buddy">
+             <cstring>qdsbTriggerClapperBlockTime</cstring>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="qgbTriggerJulius">
+         <property name="title">
+          <string>Julius</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="qcbTriggerJuliusEnabled">
+            <property name="text">
+             <string>Enabled</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="qlTriggerJuliusSentence">
+            <property name="text">
+             <string>Sentence</string>
+            </property>
+            <property name="buddy">
+             <cstring>qleTriggerJuliusSentence</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="qleTriggerJuliusSentence">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QCheckBox" name="qcbTriggerJuliusAction">
+            <property name="text">
+             <string>Action</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>qleGeneralWelcomeMessage</tabstop>
+  <tabstop>qleGeneralFailedMessage</tabstop>
+  <tabstop>qleGeneralConfirmationMessage</tabstop>
+  <tabstop>qleGeneralByeMessage</tabstop>
+  <tabstop>qsbGeneralRecognitionTimeout</tabstop>
+  <tabstop>qcbSpeaker</tabstop>
+  <tabstop>qleSpeakerSpeechDispatcherEngine</tabstop>
+  <tabstop>qleSpeakerSpeechDispatcherVoice</tabstop>
+  <tabstop>qleSpeakerSpeechDispatcherLanguage</tabstop>
+  <tabstop>qsbSpeakerSpeechDispatcherVolume</tabstop>
+  <tabstop>qsbSpeakerSpeechDispatcherRate</tabstop>
+  <tabstop>qsbSpeakerSpeechDispatcherPitch</tabstop>
+  <tabstop>qcbRecognizer</tabstop>
+  <tabstop>qleRecognizerJuliusHost</tabstop>
+  <tabstop>qleRecognizerJuliusPort</tabstop>
+  <tabstop>qleRecognizerJuliusEncoding</tabstop>
+  <tabstop>qsbRecognizerJuliusMinimumScore</tabstop>
+  <tabstop>qcbTriggerClapperEnabled</tabstop>
+  <tabstop>qleTriggerClapperDeviceIndex</tabstop>
+  <tabstop>qdsbTriggerClapperBlockTime</tabstop>
+  <tabstop>qcbTriggerJuliusEnabled</tabstop>
+  <tabstop>qleTriggerJuliusSentence</tabstop>
+  <tabstop>qcbTriggerJuliusAction</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>ConfigDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>514</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>ConfigDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>295</x>
+     <y>520</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

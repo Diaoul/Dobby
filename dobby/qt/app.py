@@ -19,6 +19,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from dobby.models.actions.datetime import Datetime
 from dobby.models.actions.weather import Weather
+from dobby.qt.dialogs.configure import ConfigForm
 from dobby.qt.dialogs.datetime import ActionDatetimeForm
 from dobby.qt.dialogs.weather import ActionWeatherForm
 from dobby.qt.models import ScenarioModel, ScenarioCommandModel, \
@@ -76,6 +77,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Dobby Signals
         self.qaStart.triggered.connect(self.startDobby)
         self.qaStop.triggered.connect(self.stopDobby)
+        
+        # Config Signals
+        self.qaConfigure.triggered.connect(self.configure)
         
         # Others
         self.qaAbout.triggered.connect(self.about)
@@ -148,6 +152,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.session.add(dialog.getAction())
         self.session.commit()
 
+    @Slot()
+    def configure(self):
+        dialog = ConfigForm(self.dobby.dobby.config, self)
+        result = dialog.exec_()
+        if result != QDialog.Accepted:
+            return
+
     def startDobby(self):
         try:
             self.dobby.start()
@@ -192,6 +203,7 @@ class DobbyApplication(QThread):
     def __init__(self, parent=None):
         super(DobbyApplication, self).__init__(parent)
         self.dobby = Dobby(os.path.abspath('data'), quiet=False, verbose=False, use_signal=False)
+        self.dobby.validate_config()
         self.running = False
 
     def stop(self):
