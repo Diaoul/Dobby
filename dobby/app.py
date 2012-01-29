@@ -220,7 +220,8 @@ def initController(event_queue, tts_queue, session, recognizer, config):
     :rtype: Controller
 
     """
-    controller = Controller(event_queue, tts_queue, session, recognizer, config['recognition_timeout'], config['failed_message'], config['confirmation_messages'])
+    #FIXME: Use multiple confirmation messages
+    controller = Controller(event_queue, tts_queue, session, recognizer, config['recognition_timeout'], config['failed_message'], list(config['confirmation_message']))
     return controller
 
 def initLogging(quiet, verbose, log_dir):
