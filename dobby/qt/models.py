@@ -32,9 +32,6 @@ class ScenarioModel(QAbstractListModel):
     def rowCount(self, parent=QModelIndex()):
         return len(self.scenarios)
 
-    def columnCount(self, parent=QModelIndex()):
-        return 1
-
     def data(self, index, role=Qt.DisplayRole):
         scenario = self.scenarios[index.row()]
         if not scenario:
@@ -55,7 +52,12 @@ class ScenarioModel(QAbstractListModel):
         self.dataChanged.emit(index, index)
         return True
 
-    def addScenario(self, name):
+    def addNewScenario(self, name):
+        """Add a new scenario
+
+        :param string name: name of the scenario
+
+        """
         self.beginInsertRows(QModelIndex(), len(self.scenarios), len(self.scenarios))
         scenario = Scenario(name=name)
         self.session.add(scenario)
@@ -63,10 +65,16 @@ class ScenarioModel(QAbstractListModel):
         self.scenarios.append(scenario)
         self.endInsertRows()
 
-    def removeScenario(self, index):
-        self.beginRemoveRows(QModelIndex(), index, index)
-        scenario = self.scenarios.pop(index)
-        self.session.delete(scenario)
+    def removeScenarios(self, row, count=1):
+        """Remove scenarios
+
+        :param int row: first row to remove
+        :param int count: number of rows to remove
+
+        """
+        self.beginRemoveRows(QModelIndex(), row, row + count - 1)
+        for i in range(row + count - 1, row - 1, -1):
+            self.session.delete(self.scenarios.pop(i))
         self.session.commit()
         self.endRemoveRows()
 
@@ -100,20 +108,32 @@ class ScenarioCommandModel(QAbstractListModel):
         self.dataChanged.emit(index, index)
         return True
 
-    def addCommand(self, text):
+    def addNewCommand(self, text):
+        """Add a new command to the scenario
+
+        :param string text: text of the command
+
+        """
         self.beginInsertRows(QModelIndex(), len(self.commands), len(self.commands))
         self.commands.append(Command(text=text))
         self.session.commit()
         self.endInsertRows()
 
-    def removeCommand(self, index):
-        self.beginRemoveRows(QModelIndex(), index, index)
-        command = self.commands.pop(index)
-        self.session.delete(command)
+    def removeCommands(self, row, count=1):
+        """Remove scenario's commands
+
+        :param int row: first row to remove
+        :param int count: number of rows to remove
+
+        """
+        self.beginRemoveRows(QModelIndex(), row, row + count - 1)
+        for i in range(row + count - 1, row - 1, -1):
+            self.commands.pop(i)
         self.session.commit()
         self.endRemoveRows()
 
     def setCommands(self, commands):
+        """Resets the model with new commands"""
         self.beginResetModel()
         self.commands = commands
         self.endResetModel()
@@ -136,9 +156,10 @@ class ScenarioActionModel(QAbstractListModel):
             for action_id in action_ids:
                 self.insertAction(self.session.query(Action).get(action_id), row if row != -1 else len(self.actions))
         elif action == Qt.DropAction.MoveAction:
-            indexes = pickle.loads(data.data('application/x-scenarioaction-index'))
-            for index in indexes:
-                self.moveAction(index, row if row != -1 else len(self.actions))
+            if row == -1:
+                return False
+            rows = pickle.loads(data.data('application/x-scenarioaction-rows'))
+            self.moveActions(min(rows), max(rows), row)
         return True
 
     def supportedDropActions(self):
@@ -146,21 +167,18 @@ class ScenarioActionModel(QAbstractListModel):
         return Qt.DropAction.CopyAction | Qt.DropAction.MoveAction
 
     def mimeTypes(self):
-        """Supported mimetypes"""
-        return ['application/x-action-id', 'application/x-scenarioaction-index']
+        return ['application/x-action-id', 'application/x-scenarioaction-rows']
 
     def mimeData(self, indexes):
         """Serialize the indexes to move in a special mimetype that is used when dragging occurs"""
         mimedata = QMimeData()
-        mimedata.setData('application/x-scenarioaction-index', pickle.dumps([index.row() for index in indexes]))
+        mimedata.setData('application/x-scenarioaction-rows', pickle.dumps([index.row() for index in indexes]))
         return mimedata
 
     def flags(self, index):
-        """Enable drag and drop"""
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
 
     def data(self, index, role=Qt.DisplayRole):
-        """Show the scenario action names as a list and use the action type to display an icon"""
         action = self.actions[sorted(self.actions.keys())[index.row()]]
         if not action:
             return None
@@ -188,25 +206,34 @@ class ScenarioActionModel(QAbstractListModel):
         self.session.commit()
         self.endInsertRows()
 
-    def moveAction(self, from_index, to_index):
-        """Change the order of the actions in the scenario"""
-        if to_index == len(self.actions) and from_index == to_index - 1:
-            return
-        self.beginMoveRows(QModelIndex(), from_index, from_index, QModelIndex(), to_index)
-        orders = self.actions.keys()
+    def moveActions(self, sourceFirst, sourceLast, destinationRow):
+        """Move actions
+
+        :param int sourceFirst: first row to move
+        :param int sourceLast: last row to move
+        :param int destinationRow: destination row
+
+        """
+        self.beginMoveRows(QModelIndex(), sourceFirst, sourceLast, QModelIndex(), destinationRow)
         actions = self.actions.values()
-        orders.pop(from_index)
-        actions.insert(to_index, actions.pop(from_index))
-        orders.insert(to_index, None)
-        for i in range(len(orders)):
+        for i in range(sourceLast, sourceFirst - 1, -1):
+            actions.insert(destinationRow - (1 if i < destinationRow else 0), actions.pop(i))
+        self.actions.clear()
+        for i in range(len(actions)):
             self.actions[i] = actions[i]
         self.session.commit()
         self.endMoveRows()
 
-    def removeAction(self, index):
-        """Detach an action from the Scenario"""
-        self.beginRemoveRows(QModelIndex(), index, index)
-        del self.actions[sorted(self.actions.keys())[index]]
+    def removeActions(self, row, count=1):
+        """Remove scenario's actions
+
+        :param int row: first row to remove
+        :param int count: number of rows to remove
+
+        """
+        self.beginRemoveRows(QModelIndex(), row, row + count - 1)
+        for i in range(row, row + count):
+            del self.actions[self.actions.keys()[i]]
         self.session.commit()
         self.endRemoveRows()
 
@@ -231,9 +258,7 @@ class ActionModel(QAbstractListModel):
         return None
 
     def mimeData(self, indexes):
-        mimeData = QMimeData()
-        itemData = QByteArray()
-        dataStream = QDataStream(itemData, QIODevice.WriteOnly)
+        mimedata = QMimeData()
         mimedata.setData('application/x-action-id', pickle.dumps([self.actions[index.row()].id for index in indexes]))
         return mimedata
 
@@ -244,9 +269,20 @@ class ActionModel(QAbstractListModel):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
     def appendAction(self, action):
+        """Append an action
+
+        :param Action action: action to append
+
+        """
         self.insertActions([action], self.rowCount())
 
     def insertActions(self, actions, row=0):
+        """Insert actions
+        
+        :param list actions: actions to insert
+        :param int row: row before which actions will be inserted
+
+        """
         self.beginInsertRows(QModelIndex(), row, row + len(actions) - 1)
         for action in reversed(actions):
             self.actions.insert(row, action)
@@ -255,6 +291,12 @@ class ActionModel(QAbstractListModel):
         self.endInsertRows()
 
     def removeActions(self, row, count=1):
+        """Remove actions
+
+        :param int row: first row to remove
+        :param int count: number of rows to remove
+
+        """
         self.beginRemoveRows(QModelIndex(), row, row + count - 1)
         for i in range(row + count - 1, row - 1, -1):
             self.session.delete(self.actions.pop(i))

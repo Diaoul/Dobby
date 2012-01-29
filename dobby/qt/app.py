@@ -99,23 +99,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def removeScenario(self):
-        self.scenarioModel.removeScenario(self.qlvScenarios.currentIndex().row())
+        self.scenarioModel.removeScenarios(self.qlvScenarios.currentIndex().row())
 
     @Slot()
     def addScenarioCommand(self):
         text = self.qleScenarioCommand.text()
         if not text:
             return
-        self.scenarioCommandModel.addCommand(text)
+        self.scenarioCommandModel.addNewCommand(text)
         self.qleScenarioCommand.clear()
 
     @Slot()
     def removeScenarioCommand(self):
-        self.scenarioCommandModel.removeCommand(self.qlvScenarioCommands.currentIndex().row())
+        self.scenarioCommandModel.removeCommands(self.qlvScenarioCommands.currentIndex().row())
 
     @Slot()
     def removeScenarioAction(self):
-        self.scenarioActionModel.removeAction(self.qlvScenarioActions.currentIndex().row())
+        self.scenarioActionModel.removeActions(self.qlvScenarioActions.currentIndex().row())
 
     @Slot()
     def addAction(self):
