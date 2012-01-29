@@ -99,4 +99,7 @@ class Controller(threading.Thread):
 
             # Mark the task as done
             self.event_queue.task_done()
+            
+            # Expire session
+            self.session.expire_all()
         logger.info(u'Terminating...')
