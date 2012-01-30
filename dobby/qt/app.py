@@ -18,9 +18,11 @@ from ..app import Application as Dobby
 from PySide.QtCore import *
 from PySide.QtGui import *
 from dobby.models.actions.datetime import Datetime
+from dobby.models.actions.feed import Feed
 from dobby.models.actions.weather import Weather
 from dobby.qt.dialogs.configure import ConfigForm
 from dobby.qt.dialogs.datetime import ActionDatetimeForm
+from dobby.qt.dialogs.feed import ActionFeedForm
 from dobby.qt.dialogs.weather import ActionWeatherForm
 from dobby.qt.models import ScenarioModel, ScenarioCommandModel, \
     ScenarioActionModel, ActionModel
@@ -128,7 +130,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif self.qcbActionType.currentText() == 'Datetime':
             dialog = ActionDatetimeForm(self)
         elif self.qcbActionType.currentText() == 'Feed':
-            dialog = ActionWeatherForm(self)
+            dialog = ActionFeedForm(self)
         result = dialog.exec_()
         if result != QDialog.Accepted:
             return
@@ -145,6 +147,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dialog = ActionWeatherForm(self)
         elif isinstance(action, Datetime):
             dialog = ActionDatetimeForm(self)
+        elif isinstance(action, Feed):
+            dialog = ActionFeedForm(self)
         dialog.fromAction(self.actionModel.actions[index.row()])
         result = dialog.exec_()
         if result != QDialog.Accepted:
