@@ -14,37 +14,31 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from ..ui.action_feed_ui import Ui_ActionFeedDialog
+from . import ActionForm
+from ..ui.action_feed_ui import Ui_ActionFeedForm
 from PySide.QtCore import *
 from PySide.QtGui import *
 from dobby.models.actions.feed import Feed
-import feedparser
 
 
-class ActionFeedForm(QDialog, Ui_ActionFeedDialog):
+class ActionFeedWidget(QWidget, Ui_ActionFeedForm):
+    def __init__(self, parent=None):
+        super(ActionFeedWidget, self).__init__(parent)
+        self.setupUi(self)
+
+
+class ActionFeedForm(ActionForm):
     def __init__(self, parent=None):
         super(ActionFeedForm, self).__init__(parent)
-        self.setModal(True)
-        self.setupUi(self)
-        self.action = None
+        self.setActionForm(ActionFeedWidget())
 
     def getAction(self):
         if not self.action:
             self.action = Feed()
-        self.action.name = self.qleName.text()
-        self.action.tts = self.qpteTTS.toPlainText()
-        self.action.url = self.qleURL.text()
+        super(ActionFeedForm, self).fillAction(self.action)
+        self.action.url = self.qwAction.qleURL.text()
         return self.action
 
     def fromAction(self, action):
-        self.action = action
-        self.qleName.setText(action.name)
-        self.qpteTTS.setPlainText(action.tts)
-        self.qleURL.setText(action.url)
-
-    def accept(self):
-        feed = feedparser.parse(self.qleURL.text())
-        if not feed['entries']:
-            QMessageBox.information(self, 'Invalid feed', 'The feed entered is invalid, please correct it or cancel', QMessageBox.Ok)
-            return
-        super(ActionFeedForm, self).accept()
+        super(ActionFeedForm, self).fromAction(action)
+        self.qwAction.qleURL.setText(action.url)

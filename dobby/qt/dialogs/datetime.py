@@ -14,27 +14,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
-from ..ui.action_datetime_ui import Ui_ActionDatetimeDialog
-from PySide.QtCore import *
-from PySide.QtGui import *
+from . import ActionForm
 from dobby.models.actions.datetime import Datetime
 
 
-class ActionDatetimeForm(QDialog, Ui_ActionDatetimeDialog):
+class ActionDatetimeForm(ActionForm):
     def __init__(self, parent=None):
         super(ActionDatetimeForm, self).__init__(parent)
-        self.setModal(True)
-        self.setupUi(self)
-        self.action = None
 
     def getAction(self):
         if not self.action:
             self.action = Datetime()
-        self.action.name = self.qleName.text()
-        self.action.tts = self.qpteTTS.toPlainText()
+        super(ActionDatetimeForm, self).fillAction(self.action)
         return self.action
 
     def fromAction(self, action):
-        self.action = action
-        self.qleName.setText(action.name)
-        self.qpteTTS.setPlainText(action.tts)
+        super(ActionDatetimeForm, self).fromAction(action)

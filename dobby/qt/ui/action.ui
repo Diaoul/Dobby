@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ActionDatetimeDialog</class>
- <widget class="QDialog" name="ActionDatetimeDialog">
+ <class>ActionDialog</class>
+ <widget class="QDialog" name="ActionDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>310</height>
+    <width>406</width>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,7 +70,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Discard|QDialogButtonBox::Save</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
      </property>
     </widget>
    </item>
@@ -86,12 +86,12 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>ActionDatetimeDialog</receiver>
+   <receiver>ActionDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>341</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -102,12 +102,12 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>ActionDatetimeDialog</receiver>
+   <receiver>ActionDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>325</x>
+     <y>341</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
