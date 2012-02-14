@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 from setuptools import setup, find_packages
+import os.path
 import dobby.infos
 
 
@@ -22,8 +23,8 @@ setup(name='Dobby',
     version=dobby.infos.__version__,
     license='GPLv3',
     description='Python implementation of Ext Direct',
-    long_description=open('README.rst').read() + '\n\n' +
-                     open('NEWS.rst').read(),
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read() + '\n\n' +
+                     open(os.path.join(os.path.dirname(__file__), 'NEWS.rst')).read(),
     keywords='speech recognition voice synthesis',
     author='Antoine Bertin',
     author_email='diaoulael@gmail.com',
