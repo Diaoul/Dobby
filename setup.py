@@ -19,12 +19,15 @@ import os.path
 import dobby.infos
 
 
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 setup(name='Dobby',
     version=dobby.infos.__version__,
     license='GPLv3',
     description='Python implementation of Ext Direct',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read() + '\n\n' +
-                     open(os.path.join(os.path.dirname(__file__), 'NEWS.rst')).read(),
+    long_description=read('README.rst') + '\n\n' +
+                     read('NEWS.rst'),
     keywords='speech recognition voice synthesis',
     author='Antoine Bertin',
     author_email='diaoulael@gmail.com',
