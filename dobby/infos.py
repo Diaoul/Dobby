@@ -16,7 +16,7 @@
 # along with Dobby.  If not, see <http://www.gnu.org/licenses/>.
 __title__ = 'Dobby'
 __description__ = 'Your servant'
-__version__ = '0.1'
+__version__ = '0.2'
 __author__ = 'Antoine Bertin'
 __license__ = 'GPLv3'
 __copyright__ = 'Copyright 2011 Antoine Bertin'
