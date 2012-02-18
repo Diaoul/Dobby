@@ -2,3 +2,5 @@ pyjulius
 pywunderground
 sqlalchemy
 pyaudio
+configobj
+feedparser
